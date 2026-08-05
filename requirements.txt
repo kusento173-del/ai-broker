@@ -1,0 +1,4 @@
+playwright
+requests
+imageio-ffmpeg
+openpyxl

@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 经纪人项目展示 PPT</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: rgba(255, 255, 255, 0.075);
+      --panel-strong: rgba(255, 255, 255, 0.12);
+      --line: rgba(255, 255, 255, 0.14);
+      --text: #eaf1fb;
+      --muted: #9fb0c7;
+      --blue: #4ea1ff;
+      --cyan: #27d6ff;
+      --green: #24d6a3;
+      --orange: #ff8a45;
+      --red: #ff5d68;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+      --radius: 8px;
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(78, 161, 255, 0.24), transparent 30%),
+        radial-gradient(circle at 86% 18%, rgba(36, 214, 163, 0.16), transparent 32%),
+        linear-gradient(135deg, #07111f 0%, #0a1628 48%, #06101d 100%);
+    }
+
+    .deck {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      padding: 5.2vh 5.6vw;
+      overflow: hidden;
+    }
+
+    .slide.active {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 2.4vh;
+      animation: enter 420ms ease both;
+    }
+
+    @keyframes enter {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 46px 46px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.52), transparent 82%);
+    }
+
+    .slide > * { position: relative; z-index: 1; }
+
+    .kicker {
+      color: var(--green);
+      font-size: clamp(13px, 1.1vw, 18px);
+      letter-spacing: 0;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0.5vh 0 0;
+      font-size: clamp(34px, 4.2vw, 68px);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(27px, 3vw, 48px);
+      line-height: 1.14;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 0 0 12px;
+      font-size: clamp(18px, 1.45vw, 24px);
+      letter-spacing: 0;
+    }
+
+    p, li {
+      color: var(--muted);
+      font-size: clamp(15px, 1.18vw, 21px);
+      line-height: 1.7;
+    }
+
+    .lead {
+      color: #dbe7f7;
+      font-size: clamp(20px, 1.7vw, 30px);
+      line-height: 1.55;
+      max-width: 980px;
+    }
+
+    .content {
+      min-height: 0;
+      display: grid;
+      align-items: center;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .progress {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 4px;
+      background: rgba(255,255,255,0.08);
+      z-index: 10;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      transition: width 260ms ease;
+    }
+
+    .nav {
+      position: fixed;
+      right: 28px;
+      bottom: 24px;
+      z-index: 20;
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav button, .start-btn {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .nav button:hover, .start-btn:hover { background: rgba(78,161,255,0.18); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: center; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      min-height: 120px;
+    }
+
+    .card strong {
+      color: #fff;
+      font-size: clamp(18px, 1.4vw, 25px);
+    }
+
+    .metric {
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(78,161,255,0.16), rgba(255,255,255,0.055));
+      border: 1px solid rgba(78,161,255,0.28);
+      padding: 20px;
+    }
+
+    .metric .num {
+      display: block;
+      font-size: clamp(34px, 3.5vw, 60px);
+      color: #fff;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .metric .label {
+      display: block;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+
+    .pill {
+      border: 1px solid rgba(36,214,163,0.38);
+      background: rgba(36,214,163,0.12);
+      color: #c6fff0;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .flow-step {
+      position: relative;
+      min-height: 126px;
+      border: 1px solid rgba(78,161,255,0.26);
+      background: rgba(78,161,255,0.09);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .flow-step span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      margin-bottom: 10px;
+      border-radius: 50%;
+      color: #04111e;
+      background: var(--green);
+      font-weight: 900;
+    }
+
+    .flow-step b { display: block; font-size: 18px; color: #fff; }
+    .flow-step small { display: block; margin-top: 8px; color: var(--muted); line-height: 1.45; }
+
+    .code {
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(3, 8, 15, 0.74);
+      color: #dff3ff;
+      padding: 18px 20px;
+      font: 15px/1.65 Consolas, "Courier New", monospace;
+      white-space: pre-wrap;
+      overflow: hidden;
+    }
+
+    .screen {
+      width: 100%;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: var(--shadow);
+      object-fit: cover;
+      max-height: 56vh;
+      background: #050a12;
+    }
+
+    .video {
+      width: 100%;
+      max-height: 58vh;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: var(--shadow);
+      background: #000;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: var(--radius);
+      font-size: clamp(14px, 1vw, 18px);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .table th, .table td {
+      padding: 13px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+      text-align: left;
+    }
+
+    .table th {
+      color: #d7f8ff;
+      background: rgba(78,161,255,0.16);
+    }
+
+    .table td { color: var(--text); }
+
+    .highlight {
+      color: #fff;
+      background: linear-gradient(90deg, rgba(255,138,69,0.22), rgba(36,214,163,0.16));
+      border: 1px solid rgba(255,138,69,0.32);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .quote {
+      font-size: clamp(22px, 2vw, 36px);
+      line-height: 1.55;
+      color: #fff;
+      padding-left: 24px;
+      border-left: 5px solid var(--green);
+    }
+
+    .file-tree {
+      font: 16px/1.7 Consolas, "Microsoft YaHei", monospace;
+      color: #dceeff;
+    }
+
+    .tag {
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    .title-slide {
+      grid-template-rows: 1fr auto !important;
+      padding: 8vh 7vw;
+    }
+
+    .title-wrap {
+      align-self: center;
+      max-width: 1120px;
+    }
+
+    .title-wrap h1 {
+      font-size: clamp(46px, 6vw, 92px);
+    }
+
+    .title-wrap .lead {
+      margin-top: 22px;
+      max-width: 900px;
+    }
+
+    .big-number {
+      font-size: clamp(72px, 9vw, 150px);
+      line-height: 0.92;
+      font-weight: 900;
+      color: transparent;
+      background: linear-gradient(180deg, #fff, #7ac8ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .compare .old { border-color: rgba(255,93,104,0.36); }
+    .compare .new { border-color: rgba(36,214,163,0.36); }
+
+    .wechat {
+      border-radius: var(--radius);
+      background: #f3f6f8;
+      color: #1f2b38;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      max-width: 640px;
+    }
+
+    .wechat h3 { color: #111; }
+    .wechat p { color: #35475a; margin: 8px 0; }
+    .wechat .link { color: #1677ff; font-weight: 800; }
+
+    @media (max-width: 900px) {
+      .slide { padding: 4vh 4.5vw; }
+      .grid-2, .grid-3, .grid-4, .grid-5, .compare, .flow { grid-template-columns: 1fr; }
+      .slide.active { overflow-y: auto; }
+      .nav { right: 12px; bottom: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" id="deck">
+    <section class="slide title-slide active">
+      <div class="title-wrap">
+        <div class="kicker">AI Broker Live Warning System</div>
+        <h1>AI 经纪人：直播预警主播自动分析系统</h1>
+        <p class="lead">从人工巡检到自动录制、AI 多维诊断、表格沉淀与企业微信群通知。</p>
+        <div class="pill-row">
+          <span class="pill">实时预警</span>
+          <span class="pill">60 秒直播取证</span>
+          <span class="pill">五维 AI 诊断</span>
+          <span class="pill">自动写表和通知</span>
+        </div>
+      </div>
+      <div class="footer"><span>新心文化 · AI 经纪人项目展示</span><span>2026</span></div>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">01 / Project In One Sentence</div><h2>一句话：让系统自动发现低效直播间，并给出可执行改进建议</h2></header>
+      <div class="content">
+        <div class="grid-2">
+          <p class="lead">系统每轮自动读取跟播列表，筛出预警主播，录制 60 秒直播片段，调用 AI 从运营、调试、妆造、才艺、声乐五个维度诊断，并自动写入表格和企业微信群。</p>
+          <div class="card">
+            <div class="flow" style="grid-template-columns: 1fr; gap: 10px;">
+              <div class="flow-step"><span>1</span><b>直播数据</b><small>读取跟播列表和主播实时指标</small></div>
+              <div class="flow-step"><span>2</span><b>预警筛选</b><small>按统一规则找出低效直播间</small></div>
+              <div class="flow-step"><span>3</span><b>AI 诊断</b><small>结合视频、音频和实时数据生成建议</small></div>
+              <div class="flow-step"><span>4</span><b>沉淀通知</b><small>写入表格，并同步企业微信群</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="footer"><span>核心定位</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">02 / Business Context</div><h2>业务背景：娱播收入高度依赖高价值用户打赏转化</h2></header>
+      <div class="content">
+        <div class="grid-3">
+          <div class="card"><strong>收入核心</strong><p>主播需要承接进房用户，尤其是高价值付费用户和大哥。</p></div>
+          <div class="card"><strong>问题暴露慢</strong><p>低场观、低音浪直播间如果不及时发现，会持续浪费流量和直播时长。</p></div>
+          <div class="card"><strong>运营压力大</strong><p>人工逐个看直播、录屏、总结问题，效率低且标准不统一。</p></div>
+        </div>
+        <div class="highlight" style="margin-top: 30px;">
+          真正需要自动化的不是“看一眼数据”，而是把发现、分析、沉淀、通知串成业务闭环。
+        </div>
+      </div>
+      <footer class="footer"><span>业务问题</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">03 / Original Workflow</div><h2>人工巡检的问题：慢、散、不稳定</h2></header>
+      <div class="content">
+        <table class="table">
+          <thead><tr><th>环节</th><th>人工方式</th><th>主要问题</th></tr></thead>
+          <tbody>
+            <tr><td>找主播</td><td>手动看跟播列表</td><td>容易遗漏，难以持续覆盖</td></tr>
+            <tr><td>判断预警</td><td>看时长、场观、音浪</td><td>标准不统一，口径经常变</td></tr>
+            <tr><td>看直播</td><td>人工点进直播间</td><td>耗时，且缺少固定取证</td></tr>
+            <tr><td>写结论</td><td>运营凭经验总结</td><td>粗细不一，不利于复盘</td></tr>
+            <tr><td>跟进通知</td><td>手动发群或填表</td><td>容易断档，难追踪</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <footer class="footer"><span>人工流程痛点</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">04 / Goals</div><h2>项目目标：把预警主播分析变成可复制的标准流程</h2></header>
+      <div class="content">
+        <div class="grid-4">
+          <div class="metric"><span class="num">01</span><span class="label">自动发现低效直播间</span></div>
+          <div class="metric"><span class="num">02</span><span class="label">自动录制视频、音频、截图</span></div>
+          <div class="metric"><span class="num">03</span><span class="label">AI 生成五维诊断建议</span></div>
+          <div class="metric"><span class="num">04</span><span class="label">表格沉淀和群通知</span></div>
+        </div>
+      </div>
+      <footer class="footer"><span>建设目标</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">05 / System Overview</div><h2>系统方案：一键启动，后台完成整条链路</h2></header>
+      <div class="content">
+        <div class="flow">
+          <div class="flow-step"><span>1</span><b>启动</b><small>START_MONITOR.cmd</small></div>
+          <div class="flow-step"><span>2</span><b>采集</b><small>复用 Edge 登录态</small></div>
+          <div class="flow-step"><span>3</span><b>筛选</b><small>统一预警规则</small></div>
+          <div class="flow-step"><span>4</span><b>取证</b><small>60 秒视频和音频</small></div>
+          <div class="flow-step"><span>5</span><b>诊断</b><small>Ark 多模态模型</small></div>
+          <div class="flow-step"><span>6</span><b>输出</b><small>WPS、飞书、企微</small></div>
+        </div>
+        <div class="code" style="margin-top: 26px;">日常操作：双击 START_MONITOR.cmd
+系统自动完成：导出数据 → 筛预警 → 录制样本 → AI 分析 → 写表 → 通知</div>
+      </div>
+      <footer class="footer"><span>总体架构</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">06 / Run Result</div><h2>最新一次完整运行：从数据到通知全链路跑通</h2></header>
+      <div class="content">
+        <div class="grid-2">
+          <div class="code">已生成: 实时主播数据-20260629-215643-含预警标记.csv
+行数: 199
+预警主播: 5，今日待分析: 1
+已保存片段 / 音频 / 截图
+开始 AI 分析，并发数: 1，提交间隔: 5 秒
+已写入本地表格: 预警主播分析_20260629.xlsx
+已发送飞书表格 webhook: 5 条
+已发送企业微信新增预警主播汇总: 1 个</div>
+          <div class="grid-2">
+            <div class="metric"><span class="num">199</span><span class="label">本轮主播数据行数</span></div>
+            <div class="metric"><span class="num">5</span><span class="label">预警主播</span></div>
+            <div class="metric"><span class="num">5</span><span class="label">飞书维度记录</span></div>
+            <div class="metric"><span class="num">1</span><span class="label">企业微信群摘要</span></div>
+          </div>
+        </div>
+      </div>
+      <footer class="footer"><span>真实运行结果</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">07 / Warning Rule</div><h2>预警规则：先找到值得运营立刻关注的直播间</h2></header>
+      <div class="content">
+        <div class="grid-3">
+          <div class="metric"><span class="num">3h+</span><span class="label">开播大于 3 小时</span></div>
+          <div class="metric"><span class="num">&lt;2000</span><span class="label">累计观众</span></div>
+          <div class="metric"><span class="num">&lt;2000</span><span class="label">音浪/流水</span></div>
+        </div>
+        <p class="lead" style="margin-top: 30px;">三项同时满足时进入预警池。规则统一在 <span class="tag">analysis_config.json</span>，以后改阈值不需要改代码。</p>
+      </div>
+      <footer class="footer"><span>预警口径</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">08 / Real Warning Data</div><h2>真实预警样例：低场观、低音浪、可直接定位到运营</h2></header>
+      <div class="content">
+        <table class="table">
+          <thead><tr><th>主播</th><th>抖音号</th><th>对应运营</th><th>累计观众</th><th>音浪</th></tr></thead>
+          <tbody>
+            <tr><td>鱼小小</td><td>95561411401</td><td>李仁创组-赵振霖（松）</td><td>1078</td><td>646</td></tr>
+            <tr><td>思杰</td><td>46662024147</td><td>朱永明组-朱朝伟（松）</td><td>280</td><td>16</td></tr>
+            <tr><td>枳枳🦖</td><td>91130336031</td><td>林文鹏组-曲延靖（现)</td><td>285</td><td>1167</td></tr>
+            <tr><td>小狗子</td><td>23795282125</td><td>林文鹏组-曲延靖（现)</td><td>267</td><td>610</td></tr>
+            <tr><td>菜菜</td><td>43743419330</td><td>林文鹏组-李鑫</td><td>361</td><td>780</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <footer class="footer"><span>最新 CSV：20260629-215643</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">09 / Data Collection</div><h2>数据采集：复用已登录 Edge，直接读取跟播列表数据</h2></header>
+      <div class="content">
+        <div class="grid-2">
+          <div class="card">
+            <h3>采集链路</h3>
+            <div class="code">Edge 登录态
+  ↓
+页面内 fetch 接口
+  ↓
+实时主播指标
+  ↓
+补全主播卡片信息
+  ↓
+生成 CSV</div>
+          </div>
+          <div class="card">
+            <h3>关键字段</h3>
+            <p>主播昵称、抖音号、对应运营、开播时长、当前人气、累计观众、音浪/流水、FLV 拉流地址、是否预警主播。</p>
+            <p>系统还会按主播 ID 做历史回填，解决接口偶发不返回昵称或抖音号的问题。</p>
+          </div>
+        </div>
+      </div>
+      <footer class="footer"><span>数据链路</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">10 / Evidence Capture</div><h2>自动取证：每个预警主播保留 60 秒直播样本</h2></header>
+      <div class="content">
+        <div class="grid-2">
+          <img class="screen" src="../daily_data/20260629/clips/7648467837925213243_7656767044847569698_20260629-215706.jpg" alt="直播截图" />
+          <div>
+            <div class="grid-2">
+              <div class="metric"><span class="num">60s</span><span class="label">录制时长</span></div>
+              <div class="metric"><span class="num">2fps</span><span class="label">AI 分析抽帧</span></div>
+              <div class="metric"><span class="num">960</span><span class="label">视频宽度</span></div>
+              <div class="metric"><span class="num">128k</span><span class="label">音频码率</span></div>
+            </div>
+            <p>AI 不只看静态数据，还结合直播画面和声音。样本可回放，便于运营复盘和复查。</p>
+          </div>
+        </div>
+      </div>
+      <footer class="footer"><span>真实截图来自 daily_data/20260629/clips</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">11 / Video Demo</div><h2>演示素材：真实直播片段可直接嵌入 PPT 播放</h2></header>
+      <div class="content">
+        <div class="grid-2">
+          <video class="video" controls muted loop preload="metadata" src="../daily_data/20260629/clips/7648467837925213243_7656767044847569698_20260629-215706.mp4"></video>
+          <div>
+            <p class="lead">这段视频是系统自动从 FLV 拉流地址录制并压缩生成的 60 秒样本。</p>
+            <div class="highlight">演示时可点击播放，让老板直观看到 AI 分析所依据的真实素材。</div>
+          </div>
+        </div>
+      </div>
+      <footer class="footer"><span>视频可能因浏览器策略需要手动点击播放</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">12 / Five Dimensions</div><h2>五个维度：围绕直播转化链路做诊断</h2></header>
+      <div class="content">
+        <div class="grid-5">
+          <div class="card"><strong>运营</strong><p>进房欢迎、互动承接、礼物引导、大哥维护。</p></div>
+          <div class="card"><strong>调试</strong><p>音画稳定、人声伴奏比例、麦距、底噪、卡顿。</p></div>
+          <div class="card"><strong>妆造</strong><p>上镜状态、人设匹配、服装妆容、背景记忆点。</p></div>
+          <div class="card"><strong>才艺</strong><p>节目完整度、点歌机制、礼物触发、内容节奏。</p></div>
+          <div class="card"><strong>声乐</strong><p>音准、节奏、咬字、气息、音色情绪。</p></div>
+        </div>
+      </div>
+      <footer class="footer"><span>AI 分析维度</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">13 / AI Output</div><h2>AI 输出不是一句话，而是一份可执行诊断单</h2></header>
+      <div class="content">
+        <div class="grid-3">
+          <div class="card"><strong>证据</strong><p>证据摘要、问题诊断、转化影响，说明为什么判断。</p></div>
+          <div class="card"><strong>动作</strong><p>优化建议、10 分钟内立刻执行、下次开播前准备。</p></div>
+          <div class="card"><strong>管理</strong><p>优先级、摘要消息、表格字段，便于运营协同。</p></div>
+        </div>
+        <div class="code" style="margin-top: 26px;">每个主播 × 5 个维度 = 5 行结构化记录
+字段包括：维度结论、证据摘要、问题诊断、转化影响、优化建议、10分钟内立刻执行、下次开播前准备、摘要消息</div>
+      </div>
+      <footer class="footer"><span>结构化结果</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">14 / Real Case</div><h2>真实案例：小狗子的运营维度诊断</h2></header>
+      <div class="content">
+        <div class="grid-2">
+          <div class="card">
+            <h3>主播数据</h3>
+            <table class="table">
+              <tbody>
+                <tr><td>主播</td><td>小狗子</td></tr>
+                <tr><td>抖音号</td><td>23795282125</td></tr>
+                <tr><td>运营</td><td>林文鹏组-曲延靖（现)</td></tr>
+                <tr><td>累计观众</td><td>267</td></tr>
+                <tr><td>音浪/流水</td><td>610</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <div class="quote">该主播连麦全程闲聊划水，无进房钩子和礼物引导，3小时场观和音浪极低，当前在线仅2人，完全无法承接高价值用户转化。</div>
+            <div class="pill-row">
+              <span class="pill">进房钩子</span>
+              <span class="pill">礼物破冰</span>
+              <span class="pill">互动小游戏</span>
+              <span class="pill">大哥荣誉感</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="footer"><span>真实 AI 结果 JSON</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">15 / Actionable Advice</div><h2>建议必须能执行：10 分钟内就能改</h2></header>
+      <div class="content">
+        <div class="grid-3">
+          <div class="card"><strong>改标题</strong><p>把标题临时改成点歌福利和目标导向，替换原来的弱承接标题。</p></div>
+          <div class="card"><strong>改节奏</strong><p>暂停聊犯困和下播话题，立刻开启猜歌名互动小游戏留客。</p></div>
+          <div class="card"><strong>改转化</strong><p>收到礼物立刻念 ID 感谢，放大送礼人的荣誉感。</p></div>
+        </div>
+        <div class="highlight" style="margin-top: 26px;">系统输出的价值不是“评价好不好”，而是告诉运营和主播下一步马上做什么。</div>
+      </div>
+      <footer class="footer"><span>可执行建议</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">16 / Output Loop</div><h2>输出沉淀：从一次分析变成可追踪运营资产</h2></header>
+      <div class="content">
+        <div class="grid-2">
+          <div class="file-tree card">daily_data/YYYYMMDD/
+├─ exports/             实时主播 CSV
+├─ clips/               视频、音频、截图
+├─ request_previews/    AI 请求预览
+├─ ai_results/          AI 结果 JSON
+├─ analysis_table/      WPS/Excel 表格
+├─ logs/                运行日志
+└─ state/               今日已分析状态</div>
+          <div class="grid-3">
+            <div class="metric"><span class="num">125</span><span class="label">CSV</span></div>
+            <div class="metric"><span class="num">584</span><span class="label">AI JSON</span></div>
+            <div class="metric"><span class="num">380</span><span class="label">MP4</span></div>
+            <div class="metric"><span class="num">371</span><span class="label">JPG</span></div>
+            <div class="metric"><span class="num">110</span><span class="label">LOG</span></div>
+            <div class="metric"><span class="num">2</span><span class="label">XLSX</span></div>
+          </div>
+        </div>
+      </div>
+      <footer class="footer"><span>沉淀资产</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">17 / Collaboration</div><h2>自动同步：表格沉淀，企业微信群提醒</h2></header>
+      <div class="content">
+        <div class="grid-2">
+          <div class="wechat">
+            <h3>新增预警主播</h3>
+            <p>1.主播昵称：小狗子，抖音号：23795282125，运营：林文鹏组-曲延靖（现)</p>
+            <p class="link">表格链接：点击打开飞书表格</p>
+          </div>
+          <div class="card">
+            <h3>联动效果</h3>
+            <p>每个主播按五个维度写入 5 条表格记录，同时在企业微信群发送本轮新增预警主播摘要。</p>
+            <p>运营可以从群消息进入表格查看完整诊断，不需要手动整理。</p>
+          </div>
+        </div>
+      </div>
+      <footer class="footer"><span>WPS / 飞书 / 企业微信</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">18 / Engineering Refactor</div><h2>工程演进：从两个大脚本重构为清晰模块</h2></header>
+      <div class="content">
+        <div class="compare">
+          <div class="card old">
+            <h3>重构前</h3>
+            <p>导出、预警、录制、AI、写表、通知逐渐堆在两个大 Python 文件里，功能能跑，但后续维护困难。</p>
+            <div class="big-number">2182</div>
+            <p>旧核心代码约 2182 行</p>
+          </div>
+          <div class="card new">
+            <h3>重构后</h3>
+            <p>按职责拆成 exporter、capture、ai_client、outputs、rules、state、pipeline 等模块。</p>
+            <div class="big-number">1492</div>
+            <p>新核心代码约 1492 行</p>
+          </div>
+        </div>
+      </div>
+      <footer class="footer"><span>架构治理</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">19 / Key Difficulties</div><h2>项目难点：不是调用 AI，而是让整条链路稳定跑</h2></header>
+      <div class="content">
+        <div class="grid-4">
+          <div class="card"><strong>登录态复用</strong><p>通过 Edge 调试端口复用已登录页面，避免重复登录。</p></div>
+          <div class="card"><strong>字段波动</strong><p>接口偶发缺昵称或抖音号，系统自动历史回填。</p></div>
+          <div class="card"><strong>成本控制</strong><p>60 秒样本、抽帧、压缩视频和音频，兼顾质量和成本。</p></div>
+          <div class="card"><strong>输出可靠</strong><p>飞书、企微、WPS 分别处理，并写状态避免重复。</p></div>
+        </div>
+      </div>
+      <footer class="footer"><span>关键技术取舍</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">20 / Value</div><h2>项目收益：系统先筛、AI 先诊断，运营再介入</h2></header>
+      <div class="content">
+        <div class="grid-4">
+          <div class="metric"><span class="num">快</span><span class="label">自动发现问题，减少人工漏看</span></div>
+          <div class="metric"><span class="num">准</span><span class="label">五维标准化诊断，减少口径差异</span></div>
+          <div class="metric"><span class="num">证</span><span class="label">视频、音频、截图和表格留存</span></div>
+          <div class="metric"><span class="num">闭</span><span class="label">表格沉淀，群内提醒，形成闭环</span></div>
+        </div>
+        <p class="lead" style="margin-top: 30px;">系统不是替代运营，而是让运营更早、更准、更有依据地介入。</p>
+      </div>
+      <footer class="footer"><span>业务价值</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">21 / Reflection</div><h2>项目心得：AI 项目的关键在业务闭环</h2></header>
+      <div class="content">
+        <div class="grid-2">
+          <div class="quote">AI 项目真正落地的关键，不是单次模型回答有多漂亮，而是能否稳定进入业务流程，形成可追踪、可复盘、可执行的闭环。</div>
+          <div class="card">
+            <p>先定义业务判断标准，再接 AI。</p>
+            <p>AI 输出必须结构化，否则无法沉淀和协同。</p>
+            <p>真实业务系统一定会遇到接口缺字段、超时、重复处理等问题。</p>
+            <p>配置必须统一，架构要尽早拆清楚。</p>
+          </div>
+        </div>
+      </div>
+      <footer class="footer"><span>项目心得</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide">
+      <header><div class="kicker">22 / Roadmap</div><h2>下一步：从自动分析走向运营闭环管理</h2></header>
+      <div class="content">
+        <div class="grid-5">
+          <div class="card"><strong>预警分级</strong><p>按严重程度区分高、中、低。</p></div>
+          <div class="card"><strong>趋势追踪</strong><p>观察同一主播连续多轮是否改善。</p></div>
+          <div class="card"><strong>运营看板</strong><p>统计每个运营名下预警主播和问题类型。</p></div>
+          <div class="card"><strong>闭环反馈</strong><p>增加待处理、已处理、已改善状态。</p></div>
+          <div class="card"><strong>模型评估</strong><p>抽样对比 AI 和资深运营判断。</p></div>
+        </div>
+      </div>
+      <footer class="footer"><span>下一阶段</span><span class="page"></span></footer>
+    </section>
+
+    <section class="slide title-slide">
+      <div class="title-wrap">
+        <div class="kicker">Closing</div>
+        <h1>让每一轮直播问题都能被及时发现、准确解释、持续跟进</h1>
+        <p class="lead">AI 经纪人把数据预警、直播取证、AI 诊断、结果沉淀和群通知串成一条运营闭环。</p>
+        <div class="pill-row">
+          <span class="pill">发现</span>
+          <span class="pill">取证</span>
+          <span class="pill">分析</span>
+          <span class="pill">沉淀</span>
+          <span class="pill">通知</span>
+          <span class="pill">跟进</span>
+        </div>
+      </div>
+      <div class="footer"><span>AI 经纪人项目展示</span><span class="page"></span></div>
+    </section>
+  </main>
+
+  <div class="nav">
+    <button id="prev">←</button>
+    <button id="next">→</button>
+  </div>
+  <div class="progress"><div class="progress-bar" id="progress"></div></div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const progress = document.getElementById('progress');
+    let current = 0;
+
+    function update() {
+      slides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === current);
+        const page = slide.querySelector('.page');
+        if (page) page.textContent = `${String(index + 1).padStart(2, '0')} / ${slides.length}`;
+      });
+      progress.style.width = `${((current + 1) / slides.length) * 100}%`;
+      document.title = `AI 经纪人项目展示 PPT ${current + 1}/${slides.length}`;
+    }
+
+    function go(delta) {
+      current = Math.max(0, Math.min(slides.length - 1, current + delta));
+      update();
+    }
+
+    document.getElementById('prev').addEventListener('click', () => go(-1));
+    document.getElementById('next').addEventListener('click', () => go(1));
+    document.addEventListener('keydown', (event) => {
+      if (['ArrowRight', 'PageDown', ' '].includes(event.key)) go(1);
+      if (['ArrowLeft', 'PageUp'].includes(event.key)) go(-1);
+      if (event.key === 'Home') { current = 0; update(); }
+      if (event.key === 'End') { current = slides.length - 1; update(); }
+    });
+    update();
+  </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+{
+  "data_root": "daily_data",
+  "ark": {
+    "api_key_env": "ARK_API_KEY",
+    "base_url": "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+    "model": "ep-20260624154802-pf2l9",
+    "temperature": 0.45,
+    "max_tokens": 12000,
+    "reasoning": {
+      "enabled": true,
+      "effort": "medium"
+    }
+  },
+  "browsers": {
+    "新心": {
+      "cdp_url": "http://127.0.0.1:9223",
+      "page_url": "https://union.bytedance.com/open/portal/live_flow/followRoomList?appId=3000&tab=followUp"
+    },
+    "中鼎": {
+      "cdp_url": "http://127.0.0.1:9224",
+      "page_url": "https://union.bytedance.com/open/portal/live_flow/followRoomList?appId=3000&tab=followUp"
+    }
+  },
+  "capture": {
+    "seconds": 60,
+    "fps": 2,
+    "video_width": 960,
+    "video_output_fps": 15,
+    "video_crf": 23,
+    "audio_bitrate": "128k",
+    "screenshot_width": 1280,
+    "screenshot_quality": 2
+  },
+  "warning_rule": {
+    "min_live_seconds": 10800,
+    "max_total_users": 2000,
+    "max_income": 2000
+  },
+  "dimensions": [
+    "运营维度",
+    "调试维度",
+    "妆造维度",
+    "才艺维度",
+    "声乐维度"
+  ],
+  "runtime": {
+    "ai_concurrency": "all",
+    "capture_concurrency": "all",
+    "ai_submit_interval_seconds": 5,
+    "monitor_interval_minutes": 10
+  },
+  "local_table": {
+    "enabled": true,
+    "directory": "analysis_table",
+    "filename": "预警主播分析_{date}.xlsx",
+    "sheet_name": "AI分析"
+  },
+  "table_webhook": {
+    "url_env": "FEISHU_TABLE_WEBHOOK_URL",
+    "url": "",
+    "submit_interval_seconds": 0.5,
+    "timeout_seconds": 30
+  },
+  "wechat_summary": {
+    "url_env": "WECHAT_SUMMARY_WEBHOOK_URL",
+    "url": "",
+    "table_url": "https://zhibogonghui.feishu.cn/wiki/JhWJwo3muiFW7pkOMVGcPQHenyd?from=from_copylink",
+    "enabled": true
+  }
+}

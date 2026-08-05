@@ -1,0 +1,1239 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI 经纪人项目成果汇报 长版大屏</title>
+  <style>
+    :root {
+      --bg: #020611;
+      --panel: rgba(8, 18, 34, .74);
+      --panel-strong: rgba(10, 28, 52, .88);
+      --line: rgba(162, 219, 255, .18);
+      --line-strong: rgba(54, 220, 255, .42);
+      --text: #edf7ff;
+      --muted: #9bb2c9;
+      --cyan: #28e4ff;
+      --green: #25d9a2;
+      --orange: #ff9b4a;
+      --red: #ff5e7a;
+      --violet: #a78bff;
+      --yellow: #ffe66d;
+      --radius: 8px;
+      --shadow: 0 28px 90px rgba(0, 0, 0, .46);
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--bg); color: var(--text); }
+    body {
+      background:
+        linear-gradient(115deg, rgba(40, 228, 255, .14), transparent 28%),
+        linear-gradient(245deg, rgba(255, 155, 74, .10), transparent 25%),
+        linear-gradient(180deg, #020611 0%, #08172b 52%, #030914 100%);
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .55;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .46;
+      background:
+        repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0, rgba(255,255,255,.04) 1px, transparent 1px, transparent 7px);
+      mix-blend-mode: screen;
+    }
+    #fx {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      opacity: .78;
+    }
+    .deck {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+    }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      padding: 5vh 5.4vw 5.2vh;
+      overflow: hidden;
+    }
+    .slide[data-chapter="0"] { background: radial-gradient(circle at 78% 20%, rgba(40,228,255,.12), transparent 28%); }
+    .slide[data-chapter="1"] { background: radial-gradient(circle at 16% 78%, rgba(255,94,122,.10), transparent 30%); }
+    .slide[data-chapter="2"] { background: radial-gradient(circle at 78% 78%, rgba(37,217,162,.12), transparent 28%); }
+    .slide[data-chapter="3"] { background: radial-gradient(circle at 16% 20%, rgba(167,139,255,.12), transparent 30%); }
+    .slide[data-chapter="4"] { background: radial-gradient(circle at 78% 18%, rgba(255,155,74,.13), transparent 30%); }
+    .slide[data-chapter="5"] { background: radial-gradient(circle at 50% 88%, rgba(255,230,109,.10), transparent 34%); }
+    .slide.active {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 2.2vh;
+      animation: enter .46s ease both;
+    }
+    @keyframes enter {
+      from { opacity: 0; transform: translateY(14px) scale(.992); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .slide::before {
+      content: attr(data-watermark);
+      position: absolute;
+      right: -2vw;
+      bottom: 3vh;
+      font-size: clamp(80px, 11vw, 190px);
+      font-weight: 950;
+      color: rgba(255, 255, 255, .035);
+      letter-spacing: 0;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .slide::after {
+      content: "";
+      position: absolute;
+      inset: 26px;
+      border: 1px solid rgba(162, 219, 255, .12);
+      border-radius: 16px;
+      pointer-events: none;
+      box-shadow: inset 0 0 44px rgba(40,228,255,.05);
+    }
+    .scan {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 34vh;
+      top: -34vh;
+      background: linear-gradient(180deg, transparent, rgba(40, 228, 255, .12), transparent);
+      animation: scan 7s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes scan { to { transform: translateY(134vh); } }
+    .slide > header, .content, .footer { position: relative; z-index: 2; }
+    header {
+      display: grid;
+      gap: 12px;
+      max-width: 1220px;
+      padding-left: 18px;
+      border-left: 4px solid rgba(40, 228, 255, .72);
+    }
+    .kicker {
+      color: var(--green);
+      font-size: clamp(13px, .9vw, 17px);
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+    h1, h2, h3, p { margin: 0; }
+    h1 {
+      font-size: clamp(48px, 6.2vw, 104px);
+      line-height: 1.02;
+      letter-spacing: 0;
+      color: #fff;
+    }
+    h2 {
+      font-size: clamp(31px, 3.35vw, 58px);
+      line-height: 1.13;
+      color: #fff;
+      letter-spacing: 0;
+    }
+    h3 {
+      font-size: clamp(19px, 1.45vw, 28px);
+      line-height: 1.28;
+      letter-spacing: 0;
+    }
+    p, li, td, th {
+      color: var(--muted);
+      font-size: clamp(15px, 1.02vw, 20px);
+      line-height: 1.62;
+    }
+    b, strong { color: #fff; }
+    .lead {
+      color: #dceeff;
+      font-size: clamp(20px, 1.65vw, 31px);
+      line-height: 1.48;
+    }
+    .content { min-height: 0; display: grid; align-items: center; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; align-items: center; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; align-items: stretch; }
+    .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; align-items: stretch; }
+    .grid5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; align-items: stretch; }
+    .grid6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; align-items: stretch; }
+    .panel, .metric, .terminal, .boss, .quote, .wechat, .media-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+    .panel {
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+      min-height: 130px;
+    }
+    .panel::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), var(--green), transparent);
+      opacity: .7;
+    }
+    .panel strong {
+      display: block;
+      margin-bottom: 10px;
+      color: #fff;
+      font-size: clamp(18px, 1.25vw, 24px);
+    }
+    .metric {
+      padding: 22px;
+      background: linear-gradient(180deg, rgba(40, 228, 255, .16), rgba(255,255,255,.055));
+      min-height: 132px;
+    }
+    .num {
+      display: block;
+      color: #fff;
+      font-weight: 950;
+      font-size: clamp(38px, 3.8vw, 72px);
+      line-height: .98;
+      letter-spacing: 0;
+    }
+    .label {
+      display: block;
+      color: var(--muted);
+      margin-top: 10px;
+      line-height: 1.45;
+      font-size: clamp(14px, .95vw, 18px);
+    }
+    .boss {
+      padding: 18px 20px;
+      border-color: rgba(255, 230, 109, .34);
+      background: linear-gradient(90deg, rgba(255, 230, 109, .12), rgba(255, 155, 74, .08));
+      color: #fff8d0;
+      font-weight: 900;
+      font-size: clamp(17px, 1.18vw, 23px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .boss::before {
+      content: "";
+      width: 10px;
+      height: 38px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--yellow), var(--orange));
+      box-shadow: 0 0 22px rgba(255, 230, 109, .32);
+      flex: 0 0 auto;
+    }
+    .quote {
+      padding: 24px 26px;
+      border-left: 5px solid var(--green);
+      color: #fff;
+      font-size: clamp(24px, 2vw, 38px);
+      line-height: 1.46;
+    }
+    .terminal {
+      padding: 20px;
+      background: rgba(1, 6, 14, .88);
+      color: #dff8ff;
+      font: 15px/1.58 Consolas, "Courier New", monospace;
+      white-space: pre-wrap;
+      max-height: 64vh;
+      overflow: hidden;
+    }
+    .terminal .ok { color: var(--green); }
+    .terminal .warn { color: var(--orange); }
+    .terminal .err { color: var(--red); }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+    }
+    .step {
+      min-height: 140px;
+      padding: 16px;
+      border: 1px solid rgba(40, 228, 255, .28);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(40, 228, 255, .12), rgba(255,255,255,.04));
+      position: relative;
+      overflow: hidden;
+    }
+    .step::before {
+      content: attr(data-step);
+      display: inline-flex;
+      width: 32px;
+      height: 32px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--green);
+      color: #01131c;
+      font-weight: 950;
+      margin-bottom: 12px;
+    }
+    .step::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--cyan), var(--green), var(--orange));
+      animation: pulseLine 2.2s ease infinite;
+    }
+    @keyframes pulseLine { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+    .step b { display: block; margin-bottom: 8px; color: #fff; font-size: 18px; }
+    .step small { color: var(--muted); line-height: 1.45; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: var(--radius);
+      background: rgba(4, 16, 30, .78);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    th, td {
+      padding: 13px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      text-align: left;
+      color: var(--text);
+      vertical-align: top;
+    }
+    th {
+      color: #d7fbff;
+      background: rgba(40, 228, 255, .14);
+      font-weight: 900;
+    }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .pill {
+      border: 1px solid rgba(40, 228, 255, .34);
+      border-radius: 999px;
+      background: rgba(40, 228, 255, .10);
+      color: #dffaff;
+      padding: 8px 12px;
+      font-weight: 900;
+      font-size: 14px;
+    }
+    .pill.hot { border-color: rgba(255, 155, 74, .42); background: rgba(255, 155, 74, .12); color: #ffe8d4; }
+    .pill.risk { border-color: rgba(255, 94, 122, .42); background: rgba(255, 94, 122, .12); color: #ffdce3; }
+    .image-wall {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: 17vh;
+      gap: 10px;
+    }
+    .image-wall img, .screen, .video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: var(--shadow);
+      background: #000;
+    }
+    .screen { height: min(58vh, 520px); }
+    .video { height: min(58vh, 520px); }
+    .media-card { padding: 12px; background: rgba(4, 16, 30, .84); }
+    .media-caption { padding: 12px 6px 2px; color: var(--muted); }
+    .radar {
+      height: 52vh;
+      min-height: 420px;
+      border: 1px solid rgba(40,228,255,.28);
+      border-radius: var(--radius);
+      background:
+        radial-gradient(circle at center, transparent 0 14%, rgba(40,228,255,.12) 15%, transparent 16% 31%, rgba(40,228,255,.10) 32%, transparent 33% 48%, rgba(40,228,255,.08) 49%, transparent 50%),
+        conic-gradient(from 0deg, rgba(37,217,162,.38), transparent 24%, rgba(40,228,255,.18), transparent 64%, rgba(255,155,74,.28));
+      position: relative;
+      overflow: hidden;
+    }
+    .radar::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: conic-gradient(from 0deg, rgba(37,217,162,.55), transparent 16%, transparent);
+      animation: rotate 7s linear infinite;
+      transform-origin: center;
+      mix-blend-mode: screen;
+    }
+    @keyframes rotate { to { transform: rotate(360deg); } }
+    .radar span {
+      position: absolute;
+      z-index: 2;
+      transform: translate(-50%, -50%);
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(3,13,25,.78);
+      border-radius: 999px;
+      padding: 9px 12px;
+      color: #fff;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .axis {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 12px;
+      align-items: center;
+      margin: 13px 0;
+    }
+    .bar {
+      height: 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .bar i {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--red), var(--orange), var(--green));
+    }
+    .wechat {
+      background: #f5f8fc;
+      color: #142334;
+      padding: 22px;
+    }
+    .wechat h3 { color: #111827; margin-bottom: 12px; }
+    .wechat p { color: #30445b; margin: 8px 0; }
+    .wechat .link { color: #1267e8; font-weight: 900; }
+    .timeline {
+      display: grid;
+      gap: 13px;
+    }
+    .event {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+    .event .time {
+      color: var(--green);
+      font-weight: 950;
+      padding-top: 14px;
+    }
+    .event .body {
+      padding: 15px 18px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: var(--radius);
+    }
+    .chapter-title {
+      align-self: center;
+      max-width: 1200px;
+    }
+    .chapter-title h1 {
+      color: transparent;
+      background: linear-gradient(180deg, #fff, #9cecff 58%, #b6ffd9);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+    .chapter-list {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .chapter-bar {
+      position: fixed;
+      left: 5.4vw;
+      right: 5.4vw;
+      top: 18px;
+      z-index: 20;
+      display: flex;
+      gap: 8px;
+      opacity: .82;
+      pointer-events: none;
+    }
+    .chapter-dot {
+      flex: 1;
+      height: 4px;
+      background: rgba(255,255,255,.10);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .chapter-dot.active { background: linear-gradient(90deg, var(--cyan), var(--green)); }
+    .nav {
+      position: fixed;
+      right: 22px;
+      bottom: 18px;
+      z-index: 30;
+      display: flex;
+      gap: 8px;
+    }
+    .nav button {
+      cursor: pointer;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: rgba(10, 28, 52, .72);
+      color: var(--text);
+      padding: 10px 14px;
+      font-weight: 900;
+      backdrop-filter: blur(12px);
+    }
+    .nav button:hover { border-color: var(--line-strong); background: rgba(40, 228, 255, .14); }
+    .progress {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 4px;
+      background: rgba(255,255,255,.08);
+      z-index: 40;
+    }
+    .progress div {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--cyan), var(--green), var(--orange), var(--red));
+      transition: width .22s ease;
+    }
+    .notes {
+      position: fixed;
+      left: 5.4vw;
+      right: 5.4vw;
+      bottom: 34px;
+      z-index: 35;
+      display: none;
+      padding: 16px 18px;
+      border: 1px solid rgba(255, 230, 109, .36);
+      border-radius: var(--radius);
+      background: rgba(20, 16, 5, .88);
+      color: #fff7d2;
+      box-shadow: var(--shadow);
+      font-size: 16px;
+      line-height: 1.55;
+    }
+    body.show-notes .notes { display: block; }
+    body.show-notes .slide.active { padding-bottom: 15vh; }
+    .subtle {
+      color: rgba(237,247,255,.72);
+      font-size: 14px;
+    }
+    .slide.active .panel,
+    .slide.active .metric,
+    .slide.active .terminal,
+    .slide.active .quote,
+    .slide.active .boss,
+    .slide.active table,
+    .slide.active .media-card {
+      animation: rise .48s ease both;
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 980px) {
+      .slide { padding: 5vh 4.6vw; }
+      .slide.active { overflow-y: auto; }
+      .grid2, .grid3, .grid4, .grid5, .grid6, .flow, .chapter-list { grid-template-columns: 1fr; }
+      .image-wall { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 22vh; }
+      .event { grid-template-columns: 1fr; }
+      .chapter-bar { left: 4.6vw; right: 4.6vw; }
+      .nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="fx"></canvas>
+  <div class="chapter-bar" id="chapterBar"></div>
+  <main class="deck" id="deck"></main>
+  <div class="notes" id="notes"></div>
+  <div class="nav"><button id="prev">Prev</button><button id="next">Next</button></div>
+  <div class="progress"><div id="bar"></div></div>
+
+  <script>
+    const imagePaths = [
+      "../daily_data/20260629/clips/7648467837925213243_7656767044847569698_20260629-215706.jpg",
+      "../daily_data/20260629/clips/7648467837925213243_7656767044847569698_20260629-215536.jpg",
+      "../daily_data/20260629/clips/3855363295165672_7656760327862356751_20260629-212611.jpg",
+      "../daily_data/20260629/clips/7655967595564205105_7656759276057774867_20260629-212611.jpg",
+      "../daily_data/20260629/clips/2654634794573843_7656757868854938387_20260629-211126.jpg",
+      "../daily_data/20260629/clips/3612314269918569_7656755122625612582_20260629-211126.jpg",
+      "../daily_data/20260629/clips/7619631487528977445_7656751390463167268_20260629-205716.jpg",
+      "../daily_data/20260629/clips/7645100960080299066_7656746862536985384_20260629-204254.jpg"
+    ];
+    const videoPath = "../daily_data/20260629/clips/7648467837925213243_7656767044847569698_20260629-215706.mp4";
+
+    const chapters = [
+      "开场与行业背景",
+      "痛点与目标",
+      "完整制作流程",
+      "技术架构与实现",
+      "真实案例与演示",
+      "心得与规划"
+    ];
+
+    const slides = [
+      {
+        chapter: 0,
+        kind: "title",
+        kicker: "AI BROKER · LIVE WARNING INTELLIGENCE",
+        title: "AI 经纪人项目成果汇报",
+        html: `<p class="lead">从娱播业务痛点出发，把实时数据、直播取证、AI 诊断、表格沉淀和企业微信提醒串成一条自动化运营闭环。</p>
+          <div class="pill-row"><span class="pill">科技大屏长版</span><span class="pill">真实业务数据</span><span class="pill hot">1 小时讲解</span><span class="pill">离线 HTML</span></div>`,
+        boss: "管理结论：这不是单个 AI Demo，而是一套能进入运营日常的预警分析系统。",
+        note: "开场先讲定位：项目不是为了炫模型，而是为了把运营巡检、直播证据、AI 诊断和跟进提醒自动串起来。"
+      },
+      {
+        chapter: 0,
+        kicker: "01 / 项目一句话",
+        title: "把低效直播间从人工巡检变成系统先筛、AI 先诊断",
+        html: `<div class="grid2"><div><p class="lead">系统每轮自动读取跟播列表，筛出预警主播，录制 60 秒直播片段，再从运营、调试、妆造、才艺、声乐五个维度生成结构化诊断。</p><div class="boss">核心变化：运营不用先大海捞针，先看系统推出来的问题主播和诊断结论。</div></div><div class="flow" style="grid-template-columns:1fr"><div class="step" data-step="1"><b>发现</b><small>实时数据识别低效直播间</small></div><div class="step" data-step="2"><b>取证</b><small>视频、音频、截图自动留存</small></div><div class="step" data-step="3"><b>分析</b><small>AI 输出五维诊断和动作建议</small></div><div class="step" data-step="4"><b>沉淀</b><small>写表、飞书、企微通知形成闭环</small></div></div></div>`,
+        note: "这一页快速建立全局认知，后面所有技术细节都围绕发现、取证、分析、沉淀四个动作展开。"
+      },
+      {
+        chapter: 0,
+        kicker: "02 / 行业背景",
+        title: "娱播收入的核心，是把进房用户转化成付费打赏",
+        html: `<div class="grid3"><div class="panel"><strong>流量不是收入</strong><p>用户进房只是第一步，真正的收入来自停留、互动、关注、打赏和复访。</p></div><div class="panel"><strong>高价值用户更稀缺</strong><p>大哥进房后，如果 3 秒内看不到价值点，很容易直接划走。</p></div><div class="panel"><strong>低效时长会持续消耗</strong><p>主播播得久但场观和音浪低，说明直播间承接链路可能断了。</p></div></div><div class="boss">管理结论：系统目标不是评价主播好坏，而是尽早发现正在浪费直播时长的房间。</div>`,
+        note: "讲清楚为什么这个项目值得做：直播间问题不是等日结才看，而是要在直播过程中更早发现。"
+      },
+      {
+        chapter: 0,
+        kicker: "03 / 转化链路",
+        title: "从进房到音浪，每一步都可能漏掉用户",
+        html: `<div class="flow"><div class="step" data-step="1"><b>进房</b><small>标题、封面、画面第一印象</small></div><div class="step" data-step="2"><b>3 秒停留</b><small>开口钩子、画面记忆点</small></div><div class="step" data-step="3"><b>互动承接</b><small>欢迎、点名、公屏响应</small></div><div class="step" data-step="4"><b>关注沉淀</b><small>关注理由、灯牌理由</small></div><div class="step" data-step="5"><b>礼物破冰</b><small>低门槛礼物触发内容</small></div><div class="step" data-step="6"><b>大哥维护</b><small>荣誉感、专属感、复访</small></div></div><div class="boss">AI 提示词围绕这条链路设计，所以输出能落到运营动作，而不是泛泛评价。</div>`,
+        note: "可以把这页当作后面五维分析的业务底座。强调提示词不是问一句这个主播怎么样，而是围绕转化链路拆解。"
+      },
+      {
+        chapter: 0,
+        kicker: "04 / 人工巡检的天然限制",
+        title: "人工看直播不是不能做，而是难以稳定覆盖",
+        html: `<table><thead><tr><th>环节</th><th>人工方式</th><th>实际问题</th><th>系统替代点</th></tr></thead><tbody><tr><td>找问题主播</td><td>运营翻列表</td><td>容易漏看，标准不稳定</td><td>按统一规则自动筛选</td></tr><tr><td>看直播</td><td>临时点进房间</td><td>没法固定取证，复盘困难</td><td>自动录制 60 秒样本</td></tr><tr><td>写结论</td><td>凭经验总结</td><td>粒度不一，难对齐</td><td>AI 五维结构化输出</td></tr><tr><td>同步跟进</td><td>手动填表发群</td><td>断点多，容易重复</td><td>自动写表和群摘要</td></tr></tbody></table>`,
+        note: "不要否定人工经验，重点说系统把重复、低效、易漏的环节自动化，运营把精力放在判断和跟进。"
+      },
+      {
+        chapter: 0,
+        kicker: "05 / 本次展示路径",
+        title: "1 小时讲解会按业务、流程、技术、案例、心得展开",
+        html: `<div class="chapter-list"><div class="panel"><strong>业务背景</strong><p>为什么娱播需要预警分析。</p></div><div class="panel"><strong>痛点目标</strong><p>从人工巡检到自动闭环。</p></div><div class="panel"><strong>制作流程</strong><p>每一步怎么做出来。</p></div><div class="panel"><strong>技术实现</strong><p>架构、配置、异常处理。</p></div><div class="panel"><strong>真实案例</strong><p>数据、视频、AI 结果和通知。</p></div><div class="panel"><strong>项目心得</strong><p>价值、经验和下一步。</p></div></div>`,
+        note: "这页相当于目录，适合告诉听众后面不是纯技术分享，也不是纯业务汇报，而是完整展示从需求到落地。"
+      },
+      {
+        chapter: 1,
+        kind: "chapter",
+        kicker: "CHAPTER 2",
+        title: "痛点与目标",
+        html: `<p class="lead">先把业务问题定义清楚，再决定系统应该自动化哪些环节。</p><div class="chapter-list"><div class="panel"><strong>痛点</strong><p>慢、散、粗、断。</p></div><div class="panel"><strong>目标</strong><p>发现、取证、分析、沉淀。</p></div><div class="panel"><strong>标准</strong><p>统一规则和统一配置。</p></div></div>`,
+        note: "章节过渡：从行业背景进入具体项目目标。"
+      },
+      {
+        chapter: 1,
+        kicker: "06 / 原始工作流",
+        title: "旧流程最大的问题，是信息散在不同人的眼睛和聊天里",
+        html: `<div class="flow"><div class="step" data-step="1"><b>看后台</b><small>人工打开跟播列表</small></div><div class="step" data-step="2"><b>找主播</b><small>根据经验判断谁异常</small></div><div class="step" data-step="3"><b>进直播间</b><small>临时观察一小段</small></div><div class="step" data-step="4"><b>口头反馈</b><small>群里简单说一句</small></div><div class="step" data-step="5"><b>手动记录</b><small>表格不完整或不统一</small></div><div class="step" data-step="6"><b>难以复盘</b><small>缺证据、缺标准、缺状态</small></div></div><div class="boss">管理结论：人工能发现问题，但很难形成规模化、标准化和可追踪。</div>`,
+        note: "这一页讲旧流程的结构性问题，不要只讲辛苦，要讲为什么辛苦也不一定稳定。"
+      },
+      {
+        chapter: 1,
+        kicker: "07 / 四个核心痛点",
+        title: "慢、散、粗、断，是系统要解决的四类问题",
+        html: `<div class="grid4"><div class="metric"><span class="num">慢</span><span class="label">发现慢，低效直播间可能已经播了几个小时。</span></div><div class="metric"><span class="num">散</span><span class="label">证据分散在截图、录屏、聊天和个人记忆里。</span></div><div class="metric"><span class="num">粗</span><span class="label">群里一句结论过短，缺少可执行细节。</span></div><div class="metric"><span class="num">断</span><span class="label">分析、写表、提醒、跟进之间容易断档。</span></div></div>`,
+        note: "这四个字后面会对应系统的四个能力：自动发现、自动取证、详细诊断、自动输出。"
+      },
+      {
+        chapter: 1,
+        kicker: "08 / 项目目标",
+        title: "把一次分析变成可复制、可追踪、可复盘的标准流程",
+        html: `<div class="grid4"><div class="panel"><strong>自动发现</strong><p>系统每轮刷新数据，按规则筛出预警主播。</p></div><div class="panel"><strong>自动取证</strong><p>录制 60 秒视频，抽取音频并保存截图。</p></div><div class="panel"><strong>自动诊断</strong><p>五个维度输出证据、诊断、影响和动作。</p></div><div class="panel"><strong>自动沉淀</strong><p>写入表格，发送新增预警主播摘要。</p></div></div><div class="boss">成功标准：运营打开表格就能看到该主播为什么预警、该怎么改、谁负责跟进。</div>`,
+        note: "强调可复制和可复盘，老板通常关心系统能不能持续用，而不是只演示一次。"
+      },
+      {
+        chapter: 1,
+        kicker: "09 / 预警口径",
+        title: "先用简单清晰的规则，抓住最需要立刻关注的直播间",
+        html: `<div class="grid3"><div class="metric"><span class="num">3h+</span><span class="label">开播时长超过 3 小时</span></div><div class="metric"><span class="num">&lt;2000</span><span class="label">累计观众低于 2000</span></div><div class="metric"><span class="num">&lt;2000</span><span class="label">音浪/流水低于 2000</span></div></div><div class="boss">规则解释：不是所有低数据都预警，而是重点抓长时间播出后仍然低场观、低流水的房间。</div>`,
+        note: "这里讲为什么不是复杂模型先筛，而是先用业务规则把最明显的问题筛出来，减少误报和沟通成本。"
+      },
+      {
+        chapter: 1,
+        kicker: "10 / 输出要求",
+        title: "群里一句话不够，表格里必须能看到完整诊断",
+        html: `<div class="grid3"><div class="panel"><strong>证据</strong><p>AI 要说明来自画面、音频、实时数据的判断依据。</p></div><div class="panel"><strong>诊断</strong><p>要指出进房钩子、互动承接、礼物引导等具体问题。</p></div><div class="panel"><strong>动作</strong><p>要给出 10 分钟内可执行和下次开播前准备。</p></div></div><div class="quote">输出不是为了好看，而是为了让运营和主播知道下一步马上做什么。</div>`,
+        note: "讲述重点：过去群内简短结论不足以指导动作，现在把完整诊断沉淀到表格，群消息只保留提醒入口。"
+      },
+      {
+        chapter: 1,
+        kicker: "11 / 成功标准",
+        title: "这个项目的验收，不是 AI 会说话，而是运营闭环能跑通",
+        html: `<table><thead><tr><th>目标</th><th>验收方式</th><th>为什么重要</th></tr></thead><tbody><tr><td>能发现</td><td>每轮输出预警主播数量</td><td>避免人工漏看</td></tr><tr><td>有证据</td><td>保留视频、音频、截图</td><td>方便复盘和说服主播</td></tr><tr><td>够具体</td><td>五维度都有结论和动作</td><td>避免空泛评价</td></tr><tr><td>能协同</td><td>写入表格并群内摘要</td><td>进入运营日常流程</td></tr></tbody></table>`,
+        note: "把验收标准讲清楚，后面展示日志和案例时就会有明确评价框架。"
+      },
+      {
+        chapter: 1,
+        kicker: "12 / 项目边界",
+        title: "第一版先做预警分析，不急着做全量主播评分系统",
+        html: `<div class="grid2"><div class="panel"><strong>先做什么</strong><p>低效直播间预警、取证、AI 分析、表格沉淀、群内提醒。</p><p>优先服务运营日常巡检和主播改进。</p></div><div class="panel"><strong>暂不做什么</strong><p>不直接替代运营判断，不做复杂绩效考核，不把 AI 结论当最终处罚依据。</p><p>先建立可靠数据和稳定流程。</p></div></div><div class="boss">管理结论：先把高频、明确、可闭环的场景做深，再扩到看板和管理系统。</div>`,
+        note: "讲项目边界可以降低预期风险，也体现工程推进的稳健性。"
+      },
+      {
+        chapter: 1,
+        kicker: "13 / 决策原则",
+        title: "系统设计遵循一个原则：如无必要，就不复杂化",
+        html: `<div class="grid3"><div class="panel"><strong>规则先行</strong><p>能用清晰业务规则解决的，不先上复杂算法。</p></div><div class="panel"><strong>配置统一</strong><p>阈值、维度、录制参数、输出开关都放在一个配置里。</p></div><div class="panel"><strong>结果落地</strong><p>每个功能都必须最终落到表格、通知或复盘资产。</p></div></div><div class="boss">这也是后面重构的核心：让项目简洁、清晰、可维护。</div>`,
+        note: "这一页为后面架构重构做铺垫，说明为什么不是越写越多，而是把职责拆清楚。"
+      },
+      {
+        chapter: 2,
+        kind: "chapter",
+        kicker: "CHAPTER 3",
+        title: "完整制作流程",
+        html: `<p class="lead">从能跑通的 MVP 开始，一步一步打通数据、取证、AI、表格和通知。</p><div class="chapter-list"><div class="panel"><strong>数据</strong><p>Edge 跟播列表和 CSV 导出。</p></div><div class="panel"><strong>取证</strong><p>60 秒视频、音频、截图。</p></div><div class="panel"><strong>输出</strong><p>AI 诊断、WPS、飞书、企微。</p></div></div>`,
+        note: "第三章重点讲制作过程，适合展开很多细节，让听众看到项目是怎么一步步成型的。"
+      },
+      {
+        chapter: 2,
+        kicker: "14 / 第一步：先跑通最小闭环",
+        title: "先不要追求大而全，先验证发现、取证、分析、输出能不能串起来",
+        html: `<div class="timeline"><div class="event"><div class="time">MVP 1</div><div class="body">拿到跟播列表数据和 FLV 拉流地址。</div></div><div class="event"><div class="time">MVP 2</div><div class="body">按预警规则筛出主播，并生成 CSV。</div></div><div class="event"><div class="time">MVP 3</div><div class="body">录制短样本并保存请求预览，降低 AI 调试成本。</div></div><div class="event"><div class="time">MVP 4</div><div class="body">接入 AI、表格和群通知，形成第一条闭环。</div></div></div>`,
+        note: "讲这个项目不是一上来就完整，而是先找最小闭环，避免陷入过度设计。"
+      },
+      {
+        chapter: 2,
+        kicker: "15 / 第二步：复用 Edge 登录态",
+        title: "数据来源来自已登录后台，复用浏览器比重新做鉴权更稳",
+        html: `<div class="grid2"><div class="terminal">Edge 调试端口
+http://127.0.0.1:9222
+
+打开跟播列表页
+读取直播指标数据
+补全主播卡片信息
+生成实时主播 CSV</div><div><p class="lead">跟播数据依赖后台登录态。项目通过 Edge 调试端口复用当前登录页面，降低鉴权复杂度，更快进入业务验证。</p><div class="boss">工程取舍：先复用已有稳定入口，后续再考虑更深层接口化。</div></div></div>`,
+        note: "讲清楚为什么不用自建应用或复杂接口。这里的关键是务实，先利用现有后台和登录态。"
+      },
+      {
+        chapter: 2,
+        kicker: "16 / 第三步：确定核心字段",
+        title: "CSV 不是简单导出，而是后续所有分析的事实底座",
+        html: `<table><thead><tr><th>字段类别</th><th>代表字段</th><th>用途</th></tr></thead><tbody><tr><td>主播身份</td><td>主播昵称、抖音号、经纪人</td><td>定位人和责任运营</td></tr><tr><td>直播状态</td><td>开播时长、当前人气、累计观众</td><td>判断是否低效</td></tr><tr><td>收益表现</td><td>音浪/流水、送礼人数、增长粉丝</td><td>判断转化是否断裂</td></tr><tr><td>取证入口</td><td>FLV 拉流地址、LiveID</td><td>录制直播片段</td></tr></tbody></table>`,
+        note: "字段设计要服务后续流程，不是看到什么就导什么。后续表格字段也做过精简。"
+      },
+      {
+        chapter: 2,
+        kicker: "17 / 第四步：处理接口波动",
+        title: "真实业务系统会缺字段，不能因为一次缺昵称就中断",
+        html: `<div class="grid2"><div><p class="lead">最新运行中，系统从历史数据自动回填了主播昵称和抖音号，避免接口偶发缺字段导致表格和通知不可读。</p><div class="boss">稳定性比一次跑通更重要：业务系统必须接受外部接口不完美。</div></div><div class="metric"><span class="num">59</span><span class="label">最新运行中自动回填主播昵称/抖音号数量</span></div></div>`,
+        note: "这一页讲真实项目会遇到什么问题。接口未返回不等于项目坏了，要有回填和容错。"
+      },
+      {
+        chapter: 2,
+        kicker: "18 / 第五步：预警筛选",
+        title: "把 199 行实时数据压缩成 5 个需要重点关注的主播",
+        html: `<div class="grid4"><div class="metric"><span class="num">199</span><span class="label">最新 CSV 主播数据行数</span></div><div class="metric"><span class="num">5</span><span class="label">本轮预警主播</span></div><div class="metric"><span class="num">1</span><span class="label">今日待分析主播</span></div><div class="metric"><span class="num">10min</span><span class="label">监控间隔可配置</span></div></div><div class="boss">系统先筛一遍，运营只需要优先看最值得处理的异常房间。</div>`,
+        note: "用真实数字支撑项目价值：从 199 行到 5 个重点，再到 1 个待分析，工作量明显下降。"
+      },
+      {
+        chapter: 2,
+        kicker: "19 / 第六步：状态去重",
+        title: "同一天同一主播不重复分析，避免表格和群消息刷屏",
+        html: `<div class="grid3"><div class="panel"><strong>已分析状态</strong><p>记录当天已处理主播，下一轮跳过。</p></div><div class="panel"><strong>增量通知</strong><p>企业微信只发新增预警主播摘要。</p></div><div class="panel"><strong>可复盘</strong><p>状态文件和日志保留在 daily_data 当天目录。</p></div></div><div class="terminal">daily_data/YYYYMMDD/state/analyzed_YYYYMMDD.json
+daily_data/YYYYMMDD/logs/run_once-YYYYMMDD-HHMMSS.log</div>`,
+        note: "讲去重是为了运营体验。自动化如果重复打扰，反而会降低使用意愿。"
+      },
+      {
+        chapter: 2,
+        kicker: "20 / 第七步：60 秒直播取证",
+        title: "视频时间提升到 60 秒后，AI 能看到更完整的节奏变化",
+        html: `<div class="grid2"><div class="media-card"><img class="screen" src="${imagePaths[0]}" alt="直播截图"><p class="media-caption">真实截图：来自 daily_data/20260629/clips</p></div><div class="grid2"><div class="metric"><span class="num">60s</span><span class="label">录制时长</span></div><div class="metric"><span class="num">2fps</span><span class="label">AI 分析抽帧</span></div><div class="metric"><span class="num">960</span><span class="label">压缩视频宽度</span></div><div class="metric"><span class="num">128k</span><span class="label">音频码率</span></div></div></div>`,
+        note: "对比之前更短视频，60 秒能看到主播是否持续互动、是否有礼物引导、是否只是某个瞬间表现不好。"
+      },
+      {
+        chapter: 2,
+        kicker: "21 / 第八步：素材压缩",
+        title: "压缩不是为了省事，而是为了在成本和质量之间平衡",
+        html: `<div class="grid3"><div class="panel"><strong>视频压缩</strong><p>控制宽度、帧率和 CRF，减少上传成本。</p></div><div class="panel"><strong>音频抽取</strong><p>保留主播话术、唱歌、伴奏和噪声判断依据。</p></div><div class="panel"><strong>截图留存</strong><p>快速展示画面状态，方便人工复核。</p></div></div><div class="boss">关键点：AI 要能看懂，不等于必须上传原始大文件。</div>`,
+        note: "讲模型成本和稳定性。多模态分析如果素材太大，会增加超时和费用。"
+      },
+      {
+        chapter: 2,
+        kicker: "22 / 第九步：直播截图墙",
+        title: "截图墙让老板一眼看到系统真的在看直播现场",
+        html: `<div class="image-wall">${imagePaths.map((p, i) => `<img src="${p}" alt="直播截图 ${i + 1}">`).join("")}</div>`,
+        note: "这一页就是为了减少空泛感。用真实截图告诉听众，AI 分析不是凭空生成。"
+      },
+      {
+        chapter: 2,
+        kicker: "23 / 第十步：请求预览",
+        title: "在真正调用 AI 前，先保存请求预览，方便排错和复盘",
+        html: `<div class="grid2"><div class="terminal">request_previews/
+├─ 主播基础信息
+├─ 直播间实时数据
+├─ 视频路径
+├─ 音频路径
+├─ 截图路径
+└─ 五维提示词</div><div><p class="lead">请求预览让问题可追踪：到底发给 AI 的素材是什么、数据是什么、提示词是什么，都能回看。</p><div class="boss">调试经验：先保存请求，再调用模型，能大幅减少盲查。</div></div></div>`,
+        note: "这页讲工程调试方法。尤其之前遇到 token、超时、接口未返回，预览能帮助定位是素材问题还是模型问题。"
+      },
+      {
+        chapter: 2,
+        kicker: "24 / 第十一步：提示词工程",
+        title: "提示词不是问“好不好”，而是把运营经验写成判断标准",
+        html: `<div class="grid2"><div class="quote">AI 输出质量的关键，是把业务判断拆成可观察、可诊断、可执行的结构。</div><div class="panel"><strong>提示词约束</strong><p>必须结合画面、音频和实时数据；必须输出证据摘要、问题诊断、转化影响、优化建议、10 分钟内动作和下次开播准备。</p><p>提示词还要说明素材压缩限制，避免把压缩画质误判为主播设备问题。</p></div></div>`,
+        note: "强调提示词升级是项目核心之一。老板不一定关心写法，但会关心为什么输出变准、变细。"
+      },
+      {
+        chapter: 2,
+        kicker: "25 / 第十二步：五个维度",
+        title: "去掉摄影维度后，当前分析聚焦五个真正需要运营处理的方向",
+        html: `<div class="grid5"><div class="panel"><strong>运营</strong><p>进房欢迎、互动承接、礼物引导、大哥维护。</p></div><div class="panel"><strong>调试</strong><p>音画稳定、人声伴奏、麦距、底噪、卡顿。</p></div><div class="panel"><strong>妆造</strong><p>上镜状态、人设匹配、服装妆容、背景记忆点。</p></div><div class="panel"><strong>才艺</strong><p>节目完整度、点歌机制、内容节奏、礼物触发。</p></div><div class="panel"><strong>声乐</strong><p>音准、节奏、咬字、气息、音色情绪。</p></div></div>`,
+        note: "这页讲为什么现在是五维而不是六维。摄影不再需要，所以系统跟业务变化同步调整。"
+      },
+      {
+        chapter: 2,
+        kicker: "26 / 第十三步：结构化 AI 输出",
+        title: "每个维度都要能变成表格字段，而不是一段散文",
+        html: `<div class="grid3"><div class="panel"><strong>证据层</strong><p>证据摘要、来自画面/音频/数据的依据。</p></div><div class="panel"><strong>诊断层</strong><p>问题诊断、转化影响、优先级。</p></div><div class="panel"><strong>动作层</strong><p>优化建议、10 分钟内动作、下次开播准备。</p></div></div><div class="terminal">每个主播 x 5 个维度 = 5 条结构化记录
+表格字段可排序、可筛选、可复盘</div>`,
+        note: "结构化是为了后续写表和统计。如果 AI 只输出长段文本，运营协同会很难。"
+      },
+      {
+        chapter: 2,
+        kicker: "27 / 第十四步：本地 WPS 表格",
+        title: "没有飞书自建应用时，先把结果稳定写入本地表格",
+        html: `<div class="grid2"><div class="terminal">daily_data/YYYYMMDD/analysis_table/
+预警主播分析_YYYYMMDD.xlsx
+
+一天一个表
+同一日期持续追加
+字段按运营需要精简</div><div><p class="lead">本地表格保证即使外部平台流程没配好，分析结果也会沉淀下来。</p><div class="boss">需求变更后已去除不需要的本地路径、主播 ID、直播间 ID、送礼人数、增长粉丝等字段。</div></div></div>`,
+        note: "这里讲为什么先做 WPS。本地可控，适合快速验证业务流程。"
+      },
+      {
+        chapter: 2,
+        kicker: "28 / 第十五步：飞书 webhook",
+        title: "通过 webhook 把 JSON 交给飞书工作流，再写入多维表",
+        html: `<div class="flow"><div class="step" data-step="1"><b>Python</b><small>整理结构化 JSON</small></div><div class="step" data-step="2"><b>Webhook</b><small>POST 到飞书工作流</small></div><div class="step" data-step="3"><b>工作流</b><small>解析字段并新增记录</small></div><div class="step" data-step="4"><b>多维表</b><small>按字段写入诊断结果</small></div><div class="step" data-step="5"><b>企微</b><small>发送新增预警摘要</small></div><div class="step" data-step="6"><b>运营</b><small>点击表格查看详情</small></div></div><div class="boss">安全边界：对外只呈现流程和能力，不暴露真实调用地址。</div>`,
+        note: "这页讲飞书方案是可行的：Python 发 JSON，飞书工作流新增记录，再触发群通知。"
+      },
+      {
+        chapter: 2,
+        kicker: "29 / 第十六步：企业微信摘要",
+        title: "群里只发新增预警主播摘要，详细内容回到表格看",
+        html: `<div class="grid2"><div class="wechat"><h3>新增预警主播</h3><p>1. 主播昵称：小狗子，抖音号：23795282125，运营：林文鹏组-曲延靖（现)</p><p class="link">表格链接：点击打开飞书表格</p></div><div class="panel"><strong>为什么这样设计</strong><p>群消息要短，负责提醒；表格要全，负责诊断和复盘。</p><p>这样既不会刷屏，又能让运营快速定位到完整结果。</p></div></div>`,
+        note: "讲述重点：企业微信负责快速提醒，完整诊断回到表格查看，避免群消息过长影响阅读效率。"
+      },
+      {
+        chapter: 3,
+        kind: "chapter",
+        kicker: "CHAPTER 4",
+        title: "技术架构与关键实现",
+        html: `<p class="lead">项目重构后，每个模块只做一件事：导出、规则、录制、AI、输出、状态、路径和配置各自独立。</p><div class="chapter-list"><div class="panel"><strong>架构</strong><p>模块职责清晰。</p></div><div class="panel"><strong>稳定</strong><p>重试、回填、去重、日志。</p></div><div class="panel"><strong>配置</strong><p>业务变化只改 JSON。</p></div></div>`,
+        note: "第四章讲技术，但要服务业务价值。不要陷入代码细节太久。"
+      },
+      {
+        chapter: 3,
+        kicker: "30 / 当前架构",
+        title: "从两个大脚本，重构成职责清晰的模块化项目",
+        html: `<div class="terminal">ai_broker/
+├─ main.py        命令行入口
+├─ pipeline.py    主流程编排
+├─ exporter.py    Edge 数据导出
+├─ capture.py     视频、音频、截图录制
+├─ ai_client.py   提示词、Ark 请求、JSON 解析
+├─ outputs.py     WPS、飞书、企业微信输出
+├─ rules.py       预警规则
+├─ state.py       已分析状态
+├─ paths.py       路径管理
+├─ config.py      配置读取
+└─ utils.py       通用小函数</div><div class="boss">重构目标：代码更少纠缠，业务规则更容易改，出问题更容易定位。</div>`,
+        note: "展示架构时强调职责，不必逐个函数讲。老板只需要知道项目从堆代码变成可维护系统。"
+      },
+      {
+        chapter: 3,
+        kicker: "31 / 主流程编排",
+        title: "Pipeline 只负责串流程，不把所有细节塞在一起",
+        html: `<div class="flow"><div class="step" data-step="1"><b>加载配置</b><small>analysis_config.json</small></div><div class="step" data-step="2"><b>导出数据</b><small>CSV + 预警标记</small></div><div class="step" data-step="3"><b>筛选待分析</b><small>规则 + 状态去重</small></div><div class="step" data-step="4"><b>录制素材</b><small>视频、音频、截图</small></div><div class="step" data-step="5"><b>AI 分析</b><small>五维结构化 JSON</small></div><div class="step" data-step="6"><b>输出结果</b><small>表格、飞书、企微</small></div></div>`,
+        note: "这一页讲编排思想：主流程看起来清楚，具体实现下沉到各模块。"
+      },
+      {
+        chapter: 3,
+        kicker: "32 / 统一配置",
+        title: "业务规则、分析维度、录制参数和输出开关都集中在一个 JSON",
+        html: `<div class="grid2"><div class="terminal">analysis_config.json
+├─ warning_rule
+├─ dimensions
+├─ capture
+├─ runtime
+├─ local_table
+├─ table_webhook
+└─ wechat_summary</div><div><p class="lead">后续要改阈值、维度、录制时长、提交间隔、表格输出或企微摘要，只改配置文件，不到处翻代码。</p><div class="boss">这是降低维护成本的关键改造。</div></div></div>`,
+        note: "讲述重点：统一配置降低维护成本，业务规则变化时不需要分散改代码。"
+      },
+      {
+        chapter: 3,
+        kicker: "33 / 导出模块",
+        title: "Exporter 解决的是数据进入系统的问题",
+        html: `<div class="grid3"><div class="panel"><strong>页面连接</strong><p>连接现有 Edge 跟播列表页。</p></div><div class="panel"><strong>指标读取</strong><p>读取开播时长、当前人气、累计观众、音浪等字段。</p></div><div class="panel"><strong>信息补全</strong><p>批量补全主播卡片，必要时从历史数据回填。</p></div></div><div class="terminal">日志片段：
+正在读取直播指标数据...
+正在补全列表昵称...
+正在批量补全主播卡片信息...
+已从历史数据回填主播昵称/抖音号: 59 个</div>`,
+        note: "讲导出模块的难点不在 CSV，而在登录态、页面数据和字段波动。"
+      },
+      {
+        chapter: 3,
+        kicker: "34 / 预警规则模块",
+        title: "Rules 只判断是否预警，避免规则散落在各处",
+        html: `<div class="grid2"><div class="panel"><strong>输入</strong><p>一行主播实时数据。</p><p>开播时长、累计观众、音浪/流水。</p></div><div class="panel"><strong>输出</strong><p>是否预警主播。</p><p>预警原因：开播大于 3 小时，且累计观众和音浪/流水都小于 2000。</p></div></div><div class="boss">规则模块独立后，业务口径调整不会影响录制、AI 和输出模块。</div>`,
+        note: "这页可以讲软件设计：规则变化是高频需求，所以必须集中管理。"
+      },
+      {
+        chapter: 3,
+        kicker: "35 / 录制模块",
+        title: "Capture 把 FLV 拉流地址变成 AI 可用的多模态素材",
+        html: `<div class="grid4"><div class="panel"><strong>视频</strong><p>保存 MP4 片段。</p></div><div class="panel"><strong>音频</strong><p>抽取 M4A 音频。</p></div><div class="panel"><strong>截图</strong><p>保存 JPG 首帧或关键帧。</p></div><div class="panel"><strong>预览</strong><p>保存请求预览 JSON。</p></div></div><div class="boss">这一步让 AI 的结论有证据，也让运营复盘有素材。</div>`,
+        note: "讲 capture 时重点说它把抽象数据变成看得见、听得到的证据。"
+      },
+      {
+        chapter: 3,
+        kicker: "36 / AI 客户端",
+        title: "AI Client 负责提示词、素材组织、请求间隔、重试和 JSON 解析",
+        html: `<div class="grid2"><div class="terminal">开始 AI 分析
+并发数: all
+提交间隔: 5 秒
+失败重试
+音频失败后可降级
+解析结构化 JSON</div><div><p class="lead">模型请求不是简单 post 一下。真实运行中要处理超时、代理连接、限流、返回内容格式等问题。</p><div class="boss">提交间隔 5 秒的设计，是在效率和稳定性之间取平衡。</div></div></div>`,
+        note: "这里可以讲之前遇到的超时和 token 问题，说明项目不是只写正常路径。"
+      },
+      {
+        chapter: 3,
+        kicker: "37 / 输出模块",
+        title: "Outputs 把 AI 结果转成运营能消费的表格和消息",
+        html: `<div class="grid3"><div class="panel"><strong>本地表格</strong><p>一天一个 xlsx，持续追加 AI 分析结果。</p></div><div class="panel"><strong>飞书表格</strong><p>通过 webhook 发送 JSON，由工作流新增记录。</p></div><div class="panel"><strong>企业微信</strong><p>只发新增预警主播摘要和表格入口。</p></div></div><div class="boss">输出层要兼容多个平台，但不能让平台逻辑污染主流程。</div>`,
+        note: "这页讲适配器思想：WPS、飞书、企微是输出渠道，不应该影响分析核心。"
+      },
+      {
+        chapter: 3,
+        kicker: "38 / 状态模块",
+        title: "State 让系统知道今天哪些主播已经处理过",
+        html: `<div class="grid2"><div class="terminal">state/
+└─ analyzed_20260629.json
+
+记录项：
+主播标识
+直播间标识
+分析时间
+输出状态</div><div><p class="lead">状态文件解决重复分析、重复写表、重复发群的问题。自动化系统必须有记忆，否则每轮都会打扰运营。</p><div class="boss">好的自动化不是一直发消息，而是在该提醒时提醒。</div></div></div>`,
+        note: "讲状态的重要性，尤其是监控任务会重复运行。"
+      },
+      {
+        chapter: 3,
+        kicker: "39 / 失败处理",
+        title: "真实项目必须把失败路径当成常态来设计",
+        html: `<div class="grid4"><div class="panel"><strong>接口缺字段</strong><p>历史 CSV、状态、AI 结果回填。</p></div><div class="panel"><strong>AI 超时</strong><p>提交间隔、重试、记录日志。</p></div><div class="panel"><strong>表格类型不匹配</strong><p>按字段类型调整日期等格式。</p></div><div class="panel"><strong>重复通知</strong><p>用状态文件控制增量发送。</p></div></div><div class="boss">这些问题都来自真实调试，不是纸面设计。</div>`,
+        note: "这一页把之前遇到的问题串起来，展示项目成熟度。"
+      },
+      {
+        chapter: 3,
+        kicker: "40 / 并发与限流",
+        title: "录制可以放开，AI 请求要尊重模型服务的稳定性",
+        html: `<div class="grid3"><div class="metric"><span class="num">all</span><span class="label">capture_concurrency 当前可不限制</span></div><div class="metric"><span class="num">all</span><span class="label">ai_concurrency 支持配置为 all</span></div><div class="metric"><span class="num">5s</span><span class="label">AI 提交间隔，降低限流和超时风险</span></div></div><div class="boss">工程取舍：并发提升效率，间隔提升稳定性，二者都应该配置化。</div>`,
+        note: "讲并发时要说明为什么录制和 AI 不一样。录制主要受本机和网络影响，AI 请求受服务端限流和超时影响。"
+      },
+      {
+        chapter: 3,
+        kicker: "41 / 安全边界",
+        title: "对外展示要有安全边界，敏感地址和密钥不进入演示材料",
+        html: `<div class="grid3"><div class="panel"><strong>密钥</strong><p>API Key 走环境变量，不写入演示材料。</p></div><div class="panel"><strong>Webhook</strong><p>展示流程，不展示完整真实地址。</p></div><div class="panel"><strong>数据</strong><p>展示必要业务样例，避免无关敏感字段。</p></div></div><div class="boss">安全结论：对外能展示系统能力，但不能泄露任何可调用入口。</div>`,
+        note: "这页适合对外展示时强调安全意识。"
+      },
+      {
+        chapter: 3,
+        kicker: "42 / 代码重构收益",
+        title: "重构不是为了好看，而是为了后续改需求不崩",
+        html: `<div class="grid2"><div class="metric"><span class="num">2182</span><span class="label">旧核心代码约 2182 行，逻辑集中在大脚本</span></div><div class="metric"><span class="num">1492</span><span class="label">重构后核心代码约 1492 行，职责拆分更清楚</span></div></div><div class="boss">功能变化不大时，代码应该更清晰，而不是越堆越多。</div>`,
+        note: "讲述重点：重构的价值不是堆功能，而是让职责更清楚、重复更少、维护成本更低。"
+      },
+      {
+        chapter: 3,
+        kicker: "43 / 日志与可观测性",
+        title: "每轮运行都留下日志，方便定位问题和复盘结果",
+        html: `<div class="terminal">run_once-20260629-215643.log
+先刷新实时导出
+行数: 199
+预警主播: 5，今日待分析: 1
+批量录制完成: 成功 1 个，跳过 0 个
+开始 AI 分析，并发数: 1，提交间隔: 5 秒
+已写入本地表格
+已发送飞书表格 webhook: 5 条
+已发送企业微信新增预警主播汇总: 1 个</div>`,
+        note: "这页展示真实日志，让老板看到不是口头说跑通，而是系统确实完整跑过。"
+      },
+      {
+        chapter: 3,
+        kicker: "44 / 交付能力",
+        title: "项目成果可离线演示、可复制交付、可用于对外展示",
+        html: `<div class="grid3"><div class="panel"><strong>无外部依赖</strong><p>样式和交互内置在 HTML，脱离网络也能打开。</p></div><div class="panel"><strong>本地证据链</strong><p>图片和视频引用 daily_data 中的真实运行资源。</p></div><div class="panel"><strong>汇报可控</strong><p>内容按章节组织，适合内部汇报和外部展示。</p></div></div><div class="boss">交付结论：项目不仅能运行，也已经形成可展示、可复盘、可复制的成果材料。</div>`,
+        note: "这里也说明演示文件怎么用。"
+      },
+      {
+        chapter: 4,
+        kind: "chapter",
+        kicker: "CHAPTER 5",
+        title: "真实案例与演示效果",
+        html: `<p class="lead">用真实运行日志、真实预警主播、真实视频和真实 AI 结果，证明系统不是空讲概念。</p><div class="chapter-list"><div class="panel"><strong>真实数据</strong><p>199 行、5 个预警、1 个待分析。</p></div><div class="panel"><strong>真实案例</strong><p>小狗子五维诊断。</p></div><div class="panel"><strong>真实输出</strong><p>表格记录和企业微信摘要。</p></div></div>`,
+        note: "第五章进入演示效果，尽量多展示真实产物。"
+      },
+      {
+        chapter: 4,
+        kicker: "45 / 最新完整运行",
+        title: "一轮完整流程已经跑通，从刷新数据到群内摘要",
+        html: `<div class="grid4"><div class="metric"><span class="num">199</span><span class="label">主播数据行数</span></div><div class="metric"><span class="num">5</span><span class="label">预警主播</span></div><div class="metric"><span class="num">5</span><span class="label">飞书维度记录</span></div><div class="metric"><span class="num">1</span><span class="label">企业微信新增摘要</span></div></div><div class="terminal">已保存片段、音频、截图、请求预览
+AI 分析主播 小狗子 / 23795282125
+已写入本地表格
+已发送飞书表格 webhook
+已发送企业微信新增预警主播汇总</div>`,
+        note: "这里把真实日志转成演示语言。"
+      },
+      {
+        chapter: 4,
+        kicker: "46 / 真实预警样例",
+        title: "预警主播能定位到人、数据和对应运营",
+        html: `<table><thead><tr><th>主播</th><th>抖音号</th><th>对应运营</th><th>累计观众</th><th>音浪</th><th>当前人气</th></tr></thead><tbody><tr><td>思杰</td><td>46662024147</td><td>朱永明组-朱朝伟（松）</td><td>280</td><td>16</td><td>5</td></tr><tr><td>枳枳</td><td>91130336031</td><td>林文鹏组-曲延靖（现)</td><td>285</td><td>1167</td><td>5</td></tr><tr><td>小狗子</td><td>23795282125</td><td>林文鹏组-曲延靖（现)</td><td>267</td><td>610</td><td>2</td></tr><tr><td>菜菜</td><td>43743419330</td><td>林文鹏组-李鑫</td><td>361</td><td>780</td><td>3</td></tr></tbody></table><div class="boss">这类主播不是没有开播，而是开播较久后仍没有形成有效承接。</div>`,
+        note: "讲述重点：此页展示部分真实样例，完整运行日志显示本轮共有 5 个预警主播。"
+      },
+      {
+        chapter: 4,
+        kicker: "47 / 真实案例：小狗子",
+        title: "从数据看：开播超过 3 小时，但场观和音浪都偏低",
+        html: `<div class="grid2"><table><tbody><tr><th>主播</th><td>小狗子</td></tr><tr><th>抖音号</th><td>23795282125</td></tr><tr><th>运营</th><td>林文鹏组-曲延靖（现)</td></tr><tr><th>开播时长</th><td>03:10:11</td></tr><tr><th>当前人气</th><td>2</td></tr><tr><th>累计观众</th><td>267</td></tr><tr><th>音浪/流水</th><td>610</td></tr></tbody></table><div><p class="lead">该案例完整覆盖数据预警、直播取证、AI 诊断、表格沉淀和群内摘要。</p><div class="boss">管理结论：问题主播不是靠感觉选出来，而是由规则和实时数据先筛出来。</div></div></div>`,
+        note: "这页开始进入单个主播案例。"
+      },
+      {
+        chapter: 4,
+        kicker: "48 / 真实视频演示",
+        title: "AI 分析依据的直播片段可以现场播放",
+        html: `<div class="grid2"><div class="media-card"><video class="video" controls muted loop preload="metadata" src="${videoPath}"></video><p class="media-caption">真实 60 秒片段：来自 daily_data/20260629/clips</p></div><div><p class="lead">视频证据证明 AI 不只看表格数字，而是结合直播画面、声音和实时指标综合判断。</p><div class="boss">展示结论：每条 AI 诊断都可以回到真实直播片段复核。</div></div></div>`,
+        note: "现场演示时可以播放一小段，不需要播完整 60 秒。"
+      },
+      {
+        chapter: 4,
+        kicker: "49 / AI 运营维度结论",
+        title: "AI 不是泛泛评价，而是直接指出转化链路断在哪里",
+        html: `<div class="quote">该主播连麦全程闲聊划水，无进房钩子和礼物引导，3 小时场观和音浪极低，当前在线仅 2 人，完全无法承接高价值用户转化。</div><div class="grid3" style="margin-top:24px"><div class="panel"><strong>进房钩子</strong><p>新用户进房后看不到明确价值点。</p></div><div class="panel"><strong>礼物引导</strong><p>缺少公开、低门槛、可参与的打赏触发。</p></div><div class="panel"><strong>大哥维护</strong><p>送礼反馈和荣誉感不足。</p></div></div>`,
+        note: "这里用真实 AI 结论，注意讲它为什么可执行。"
+      },
+      {
+        chapter: 4,
+        kicker: "50 / 证据摘要",
+        title: "好的 AI 结论必须能说出自己为什么这样判断",
+        html: `<div class="grid3"><div class="panel"><strong>音频证据</strong><p>主播吐槽犯困、点名求老大哥送礼，缺少新粉欢迎话术。</p></div><div class="panel"><strong>画面证据</strong><p>多人连麦过程缺少明确内容规划，礼物反馈较临时。</p></div><div class="panel"><strong>数据证据</strong><p>开播 3 小时，场观 267，音浪 610，当前在线 2 人。</p></div></div><div class="boss">证据摘要能减少争议：不是 AI 主观说差，而是基于画面、声音和数据。</div>`,
+        note: "这一页展示 AI 输出的可信度。"
+      },
+      {
+        chapter: 4,
+        kicker: "51 / 10 分钟内动作",
+        title: "建议必须能马上执行，否则运营拿到也没法跟进",
+        html: `<div class="grid3"><div class="panel"><strong>改标题</strong><p>临时改成点歌福利和目标导向，替换弱承接标题。</p></div><div class="panel"><strong>改节奏</strong><p>暂停犯困和下播话题，开启猜歌名或点歌互动。</p></div><div class="panel"><strong>改转化</strong><p>收到礼物立刻念 ID 感谢，放大送礼人的荣誉感。</p></div></div><div class="boss">系统真正的价值，是把问题翻译成运营和主播能立即执行的动作。</div>`,
+        note: "这一页非常适合老板听，强调落地动作。"
+      },
+      {
+        chapter: 4,
+        kicker: "52 / 五维诊断面板",
+        title: "同一个主播，不同维度给不同角色看",
+        html: `<div class="grid2"><div><div class="axis"><strong>运营维度</strong><div class="bar"><i style="width:18%"></i></div></div><div class="axis"><strong>调试维度</strong><div class="bar"><i style="width:54%"></i></div></div><div class="axis"><strong>妆造维度</strong><div class="bar"><i style="width:46%"></i></div></div><div class="axis"><strong>才艺维度</strong><div class="bar"><i style="width:38%"></i></div></div><div class="axis"><strong>声乐维度</strong><div class="bar"><i style="width:44%"></i></div></div></div><div class="radar"><span style="left:50%;top:12%">运营</span><span style="left:84%;top:38%">调试</span><span style="left:70%;top:78%">妆造</span><span style="left:30%;top:78%">才艺</span><span style="left:16%;top:38%">声乐</span></div></div>`,
+        note: "这里的条形图用于展示大屏效果，不代表系统当前已有固定打分模型。讲的时候说是诊断面板表达方式。"
+      },
+      {
+        chapter: 4,
+        kicker: "53 / 表格沉淀效果",
+        title: "每个维度都是一条可筛选、可复盘、可分配的记录",
+        html: `<table><thead><tr><th>分析日期</th><th>主播昵称</th><th>抖音号</th><th>对应运营</th><th>分析维度</th><th>维度结论</th></tr></thead><tbody><tr><td>2026-06-29</td><td>小狗子</td><td>23795282125</td><td>林文鹏组-曲延靖（现)</td><td>运营维度</td><td>连麦闲聊，无进房钩子和礼物引导。</td></tr><tr><td>2026-06-29</td><td>小狗子</td><td>23795282125</td><td>林文鹏组-曲延靖（现)</td><td>调试维度</td><td>音画需关注，人声和伴奏比例影响听感。</td></tr><tr><td>2026-06-29</td><td>小狗子</td><td>23795282125</td><td>林文鹏组-曲延靖（现)</td><td>声乐维度</td><td>结合音频判断唱歌状态和用户停留价值。</td></tr></tbody></table>`,
+        note: "这页展示表格字段如何落地，注意已经删掉不需要的本地路径和内部 ID 字段。"
+      },
+      {
+        chapter: 4,
+        kicker: "54 / 通知闭环",
+        title: "企业微信只承担提醒入口，完整诊断沉淀在表格",
+        html: `<div class="grid2"><div class="wechat"><h3>新增预警主播</h3><p>1. 主播昵称：小狗子，抖音号：23795282125，运营：林文鹏组-曲延靖（现)</p><p class="link">表格链接：点击查看完整 AI 分析</p></div><div class="panel"><strong>闭环逻辑</strong><p>群消息负责让运营知道有新增预警；飞书或 WPS 表格负责承载详细五维诊断；状态文件负责避免重复发送。</p></div></div>`,
+        note: "讲清楚为什么群内容不需要太长。长内容在表格，群里只做高效通知。"
+      },
+      {
+        chapter: 4,
+        kicker: "55 / 真实资产规模",
+        title: "系统已经沉淀出可复盘的数据资产",
+        html: `<div class="grid6"><div class="metric"><span class="num">125</span><span class="label">CSV</span></div><div class="metric"><span class="num">584</span><span class="label">AI JSON</span></div><div class="metric"><span class="num">380</span><span class="label">MP4</span></div><div class="metric"><span class="num">371</span><span class="label">JPG</span></div><div class="metric"><span class="num">377</span><span class="label">M4A</span></div><div class="metric"><span class="num">110</span><span class="label">LOG</span></div></div><div class="boss">这说明项目已经不只是演示页，而是实际运行后留下了数据、素材和分析结果。</div>`,
+        note: "数据资产页很适合对外展示项目成熟度。"
+      },
+      {
+        chapter: 5,
+        kind: "chapter",
+        kicker: "CHAPTER 6",
+        title: "项目心得、价值总结与下一步",
+        html: `<p class="lead">AI 项目落地的关键不是单次回答，而是能否稳定进入业务流程，并持续产生可追踪的运营价值。</p><div class="chapter-list"><div class="panel"><strong>价值</strong><p>更早发现，更准诊断。</p></div><div class="panel"><strong>心得</strong><p>业务闭环先于模型炫技。</p></div><div class="panel"><strong>规划</strong><p>从预警分析走向运营管理。</p></div></div>`,
+        note: "最后一章收束价值和未来规划。"
+      },
+      {
+        chapter: 5,
+        kicker: "56 / 业务价值",
+        title: "系统先筛、AI 先诊断，运营再介入",
+        html: `<div class="grid4"><div class="metric"><span class="num">快</span><span class="label">自动发现问题，减少人工漏看</span></div><div class="metric"><span class="num">准</span><span class="label">五维标准化诊断，减少口径差异</span></div><div class="metric"><span class="num">证</span><span class="label">视频、音频、截图和日志留存</span></div><div class="metric"><span class="num">闭</span><span class="label">表格沉淀，群内提醒，形成闭环</span></div></div><div class="boss">系统不是替代运营，而是让运营更早、更准、更有依据地介入。</div>`,
+        note: "价值总结要短而有力。"
+      },
+      {
+        chapter: 5,
+        kicker: "57 / 项目心得",
+        title: "AI 项目真正难的，是把模型能力放进稳定业务流程",
+        html: `<div class="grid2"><div class="quote">单次模型回答漂亮，不等于项目落地。能持续跑、能被运营使用、能被复盘，才是业务价值。</div><div class="panel"><p>先定义业务判断标准，再接 AI。</p><p>AI 输出必须结构化，否则无法沉淀。</p><p>真实业务一定会遇到缺字段、超时、类型不匹配和重复处理。</p><p>配置必须统一，架构要尽早拆清楚。</p></div></div>`,
+        note: "这一页适合讲个人项目心得，也能体现对 AI 落地的理解。"
+      },
+      {
+        chapter: 5,
+        kicker: "58 / 下一步规划",
+        title: "从自动分析，走向运营闭环管理",
+        html: `<div class="grid5"><div class="panel"><strong>预警分级</strong><p>高、中、低风险区分处理优先级。</p></div><div class="panel"><strong>趋势追踪</strong><p>观察同一主播连续多轮是否改善。</p></div><div class="panel"><strong>运营看板</strong><p>统计每个运营名下问题主播和问题类型。</p></div><div class="panel"><strong>闭环状态</strong><p>待处理、已处理、已改善。</p></div><div class="panel"><strong>模型评估</strong><p>抽样对比 AI 和资深运营判断。</p></div></div>`,
+        note: "规划要现实，不要一下子承诺全自动管理。"
+      },
+      {
+        chapter: 5,
+        kicker: "59 / 现场演示节奏",
+        title: "1 小时讲解建议按 6 个段落推进",
+        html: `<table><thead><tr><th>段落</th><th>时长</th><th>重点</th></tr></thead><tbody><tr><td>开场和背景</td><td>8 分钟</td><td>为什么娱播需要 AI 预警</td></tr><tr><td>痛点和目标</td><td>10 分钟</td><td>人工巡检问题和系统目标</td></tr><tr><td>制作流程</td><td>18 分钟</td><td>从数据到取证到输出</td></tr><tr><td>技术架构</td><td>12 分钟</td><td>模块化、配置、稳定性</td></tr><tr><td>真实案例</td><td>9 分钟</td><td>小狗子案例和视频演示</td></tr><tr><td>总结规划</td><td>3 分钟</td><td>价值、心得、下一步</td></tr></tbody></table>`,
+        note: "讲述重点：用这页控制 1 小时汇报节奏，避免技术细节挤占业务价值总结。"
+      },
+      {
+        chapter: 5,
+        kind: "title",
+        kicker: "CLOSING",
+        title: "让每一轮直播问题都能被及时发现、准确解释、持续跟进",
+        html: `<p class="lead">AI 经纪人把数据预警、直播取证、AI 诊断、结果沉淀和群内提醒串成一条运营闭环。</p><div class="pill-row"><span class="pill">发现</span><span class="pill">取证</span><span class="pill">分析</span><span class="pill">沉淀</span><span class="pill">通知</span><span class="pill hot">持续迭代</span></div><div class="boss">最终目标：让运营从被动巡检，变成主动管理和持续优化。</div>`,
+        note: "收尾时回到业务价值，强调这是一个可持续迭代的运营系统。"
+      }
+    ];
+
+    const deck = document.getElementById("deck");
+    const notes = document.getElementById("notes");
+    const bar = document.getElementById("bar");
+    const chapterBar = document.getElementById("chapterBar");
+
+    chapterBar.innerHTML = chapters.map((name, index) => `<div class="chapter-dot" title="${name}" data-chapter="${index}"></div>`).join("");
+
+    function renderSlide(slide, index) {
+      const section = document.createElement("section");
+      section.className = `slide ${slide.kind === "title" ? "title-slide" : ""} ${slide.kind === "chapter" ? "chapter-slide" : ""}`;
+      section.dataset.index = index;
+      section.dataset.chapter = slide.chapter;
+      section.dataset.watermark = String(index + 1).padStart(2, "0");
+      const header = slide.kind === "title" || slide.kind === "chapter"
+        ? ""
+        : `<header><div class="kicker">${slide.kicker}</div><h2>${slide.title}</h2></header>`;
+      const titleBody = slide.kind === "title" || slide.kind === "chapter"
+        ? `<div class="chapter-title"><div class="kicker">${slide.kicker}</div><h1>${slide.title}</h1>${slide.html || ""}</div>`
+        : `<div class="content">${slide.html || ""}${slide.boss ? `<div class="boss" style="margin-top:22px">${slide.boss}</div>` : ""}</div>`;
+      section.innerHTML = `<div class="scan"></div>${header}${titleBody}<footer class="footer"><span>${chapters[slide.chapter]}</span><span class="page"></span></footer>`;
+      deck.appendChild(section);
+    }
+
+    slides.forEach(renderSlide);
+    const sections = [...document.querySelectorAll(".slide")];
+    let current = 0;
+
+    function update() {
+      sections.forEach((section, index) => {
+        const active = index === current;
+        section.classList.toggle("active", active);
+        const page = section.querySelector(".page");
+        if (page) page.textContent = `${String(index + 1).padStart(2, "0")} / ${sections.length}`;
+      });
+      document.querySelectorAll(".chapter-dot").forEach(dot => {
+        dot.classList.toggle("active", Number(dot.dataset.chapter) === slides[current].chapter);
+      });
+      notes.textContent = slides[current].note || "";
+      bar.style.width = `${((current + 1) / sections.length) * 100}%`;
+      document.title = `AI 经纪人项目展示 长版大屏 ${current + 1}/${sections.length}`;
+    }
+
+    function go(delta) {
+      current = Math.max(0, Math.min(sections.length - 1, current + delta));
+      update();
+    }
+
+    document.getElementById("prev").onclick = () => go(-1);
+    document.getElementById("next").onclick = () => go(1);
+    document.addEventListener("keydown", event => {
+      if (["ArrowRight", "PageDown", " "].includes(event.key)) { event.preventDefault(); go(1); }
+      if (["ArrowLeft", "PageUp"].includes(event.key)) { event.preventDefault(); go(-1); }
+      if (event.key === "Home") { current = 0; update(); }
+      if (event.key === "End") { current = sections.length - 1; update(); }
+      if (event.key.toLowerCase() === "n") document.body.classList.toggle("show-notes");
+    });
+
+    const canvas = document.getElementById("fx");
+    const ctx = canvas.getContext("2d");
+    let points = [];
+    function resize() {
+      canvas.width = window.innerWidth * devicePixelRatio;
+      canvas.height = window.innerHeight * devicePixelRatio;
+      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+      const count = Math.min(88, Math.max(42, Math.floor(window.innerWidth / 22)));
+      points = Array.from({ length: count }, () => ({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        vx: (Math.random() - .5) * .32,
+        vy: (Math.random() - .5) * .32,
+        r: Math.random() * 1.7 + .5
+      }));
+    }
+    function draw() {
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      ctx.lineWidth = 1;
+      for (const p of points) {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < -20) p.x = window.innerWidth + 20;
+        if (p.x > window.innerWidth + 20) p.x = -20;
+        if (p.y < -20) p.y = window.innerHeight + 20;
+        if (p.y > window.innerHeight + 20) p.y = -20;
+      }
+      for (let i = 0; i < points.length; i++) {
+        const a = points[i];
+        ctx.beginPath();
+        ctx.fillStyle = "rgba(40, 228, 255, .62)";
+        ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+        ctx.fill();
+        for (let j = i + 1; j < points.length; j++) {
+          const b = points[j];
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < 135) {
+            ctx.strokeStyle = `rgba(40, 228, 255, ${(1 - distance / 135) * .16})`;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+    window.addEventListener("resize", resize);
+    resize();
+    draw();
+    update();
+  </script>
+</body>
+</html>
